@@ -1,6 +1,6 @@
 {
   "name": "modern-color",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "main": "src/index.js",
   "author": "Ron Gilchrist (thewebkid)",
   "description": "An ES6+ color class that simplifies color parsing and conversion as well as most common color functions.",

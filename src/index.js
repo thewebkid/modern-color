@@ -321,12 +321,11 @@ export class Color {
     return this.a === undefined ? 1 : this.a;
   }
   get rgb() {//simple rgb array
-    const [r, g, b] = this;
-    return [r, g, b];
+    return [this.r, this.g, this.b];
   }
   get rgba() {//simple rgb array
-    const [r, g, b] = this;
-    return [r, g, b, this.alpha];
+
+    return [this.r, this.g, this.b, this.alpha];
   }
   get rgbObj() {
     let {r, g, b} = this;

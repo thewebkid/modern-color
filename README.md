@@ -6,14 +6,14 @@ An ES6+ color class that simplifies color parsing and conversion as well as most
   
 ## Parsing examples (constructors)
 The below all return color objects with identical r, g, and b values - they only differ in how they were constructed.
-####named colors
+###named colors
 ```javascript
 //named
 const colorNamed = new Color('salmon');
 const colorNamed = new Color('salmon', 0.65); //alpha channel as 2nd param
 ```
 
-####hex, rgbaHex
+###hex, rgbaHex
 ```javascript
 //hexadecimal
 const colorHex = new Color('#FA8072')
@@ -23,19 +23,19 @@ const colorHex = new Color('#FA8072', 0.65); //alpha as 2nd param
 const rgbaHex = new Color('#FA8072A6');//rgba hex
 ```
 
-####rgb String
+###rgb String
 ```javascript
 const fromCssString = new Color('rgba(250, 128, 114, 0.65)');
 const fromCssString = new Color('rgb(250, 128, 114)');
 ```
 
-####Individual params: r,b,g,a 
+###Individual params: r,b,g,a 
 ```javascript
 const colorFromParams = new Color(250, 128, 114);
 const colorFromParams = new Color(250, 128, 114, 0.65);//w/alpha
 ```
 
-####rgb, hsl, and hsv Objects 
+###rgb, hsl, and hsv Objects 
 ```javascript
 const colorRGB = new Color({r:250, g:128, b:114});
 const colorHsl = new Color({h:6, s:93, l:71});
@@ -46,7 +46,7 @@ const colorHsl = new Color({h:6, s:93, l:71, a:0.65});
 const colorHsv = new Color({h:6, s:54, v:98, a:0.65});
 ```
 
-#### rgb and rgba Array
+### rgb and rgba Array
 ```javascript
 const colorFromArray = new Color([250, 128, 114]);
 const colorFromArray = new Color([250, 128, 114, 0.65]);//arr[3] if present is alpha 
@@ -67,7 +67,7 @@ console.log(c.hsl, c.rgb);
 
 ## Formats (property getters)
 
-####rgb, rgba (Array)
+###rgb, rgba (Array)
 ```javascript
 /*** Getters ***/
 console.log(color.rgb);// array
@@ -75,7 +75,7 @@ console.log(color.rgb);// array
 console.log(color.rgba);// array
 // [250, 128, 114, 1]
 ```
-####rgb, hsl, hsv (Object)
+###rgb, hsl, hsv (Object)
 ```javascript
 console.log(color.rgbObj);// object
 //{r:250, g:128, b:114, a:0.65} || {r:250, g:128, b:114, a:1}
@@ -84,7 +84,7 @@ console.log(color.hsl);//object
 console.log(color.hsv);//object
 // {h:6, s:54, v:98}
 ```
-####hex, rgbString, rgbaHex (String)
+###hex, rgbString, rgbaHex (String)
 ```javascript
 console.log(color.hex);//string
 //#FA8072 - no alpha channel
@@ -95,7 +95,7 @@ console.log(color.rgbString);//string
 // always returns rgba with alpha channel defaulting to 1
 ```
 
-####Misc (alpha, toString)
+###Misc (alpha, toString)
 ```javascript
 console.log(color.alpha);//this.a or 1 if undefined
 
@@ -110,14 +110,15 @@ These return new color instances and do not modify the original color. The ratio
 
 The examples show hsl objects in places for clarity, but the color instance actually returned will not have these channel values unless you call color.hsl or color.hsv.
 
-####hue (aka rotate)
+###hue (aka rotate)
 ```javascript
 //accepts an int up to 359
 //changes hue of a color
 const deg = 270;
 color.hue(deg);//color.rotate is an alias for hue
 ```
-####mix (aka blend)
+
+###mix (aka blend)
 ```javascript
 //color2 can be a single color constructor (array, hex, rgbString, etc)
 //examples using grayscale for simplicity  
@@ -126,7 +127,7 @@ color2 = new Color([200,200,200]);
 color.mix(color2, 0.25).rgb;//-->[125,125,125]
 color2.mix(color, 0.25).rgb;//-->[175,175,175]
 ```
-####saturate/desaturate/grayscale
+###saturate/desaturate/grayscale
 ```javascript
 //increase saturation by specified ratio
 color.saturate(0.3);//{h:10,s:50,l:50}->{h:10,s:65,l:50}
@@ -137,14 +138,14 @@ color.desaturate(0.3);//{h:10,s:50,l:50}->{h:10,s:35,l:50}
 //grayscale() is shorthand for desaturate(1);
 color.grayscale();//{h:10,s:50,l:50}->{h:10,s:0,l:50}
 ```
-####darken/lighten
+###darken/lighten
 Increase lightness or darkness by specified ratio 
 ```javascript
 color.lighten(0.3);//{h:10,s:50,l:50} -> {h:10,s:50,l:65}
 
 color.darken(0.3);//{h:10,s:50,l:50} -> {h:10,s:50,l:35}
 ```
-####fadeIn/fadeOut
+###fadeIn/fadeOut
 Increase opacity or transparency by a given ratio. 
 ```javascript
 //increase opacity (decrease transparency) by ratio
@@ -153,7 +154,7 @@ color.fadeIn(0.5);//{r:0, g:0, b:0, a:0.5}->{r:0, g:0, b:0, a:0.75}
 //decrease opacity (increase transparency) by ratio
 color.fadeOut(0.5);//{r:0, g:0, b:0, a:0.5}->{r:0, g:0, b:0, a:0.25}
 ```
-####negate
+###negate
 Subtract r, g, and b channel values from max (255) 
 ```javascript
 color.negate();//{r:0, g:128, b:200}->{r:255,g:127,b:55}

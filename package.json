@@ -1,19 +1,29 @@
 {
   "name": "modern-color",
-  "version": "0.1.0",
-  "main": "./index.js",
+  "version": "0.1.1",
+  "main": "src/index.js",
   "author": "Ron Gilchrist (thewebkid)",
   "description": "An ES6+ color class that simplifies color parsing and conversion as well as most common color functions.",
-  "keywords": ["color","colors","js","ES6","ES7"],
+  "keywords": [
+    "color",
+    "colors",
+    "js",
+    "ES6",
+    "ES7"
+  ],
   "license": "MIT",
   "files": [
-    "./index.js"
+    "src/index.js"
   ],
+  "scripts": {
+    "build": "bili --name index"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/thewebkid/modern-color.git"
   },
   "devDependencies": {
-    "eslint": "^5.16.0"
+    "eslint": "^5.16.0",
+    "bili": "^4.8.0"
   }
 }

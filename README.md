@@ -1,8 +1,12 @@
-# modern-color (ES6+ color class) 
+# modern-color (ES6+ color class)  [![npm version](https://badge.fury.io/js/modern-color.svg)](https://badge.fury.io/js/modern-color) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 An ES6+ color class that simplifies color parsing and conversion as well as most common color functions. To visually see the channels of a color, see [this demo](http://preview.thewebkid.com/modules/v-cpicker).
  
+## Installation
+    npm i --save modern-color
 
+### Initialize 
+    import {Color} from "modern-color";
   
 ## Parsing examples (constructors)
 The below all return color objects with identical r, g, and b values - they only differ in how they were constructed.

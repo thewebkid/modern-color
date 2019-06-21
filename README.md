@@ -13,7 +13,7 @@ const colorNamed = new Color('salmon');
 const colorNamed = new Color('salmon', 0.65); //alpha channel as 2nd param
 ```
 
-### hex, rgbaHex
+### (string) hex, rgbaHex, rgb() 
 ```javascript
 //hexadecimal
 const colorHex = new Color('#FA8072')
@@ -21,21 +21,18 @@ const colorHex = new Color('#FA8072')
 const colorHex = new Color('#FA8072', 0.65); //alpha as 2nd param
 // -or last 2 hex chars-
 const rgbaHex = new Color('#FA8072A6');//rgba hex
-```
 
-### rgb String
-```javascript
 const fromCssString = new Color('rgba(250, 128, 114, 0.65)');
 const fromCssString = new Color('rgb(250, 128, 114)');
 ```
 
-### Individual params: r,b,g,a 
+### (number params) r, b, g, a 
 ```javascript
 const colorFromParams = new Color(250, 128, 114);
 const colorFromParams = new Color(250, 128, 114, 0.65);//w/alpha
 ```
 
-### rgb, hsl, and hsv Objects 
+### (object) rgb, hsl, and hsv  
 ```javascript
 const colorRGB = new Color({r:250, g:128, b:114});
 const colorHsl = new Color({h:6, s:93, l:71});
@@ -46,14 +43,14 @@ const colorHsl = new Color({h:6, s:93, l:71, a:0.65});
 const colorHsv = new Color({h:6, s:54, v:98, a:0.65});
 ```
 
-### rgb and rgba Array
+### (array) rgb and rgba
 ```javascript
 const colorFromArray = new Color([250, 128, 114]);
 const colorFromArray = new Color([250, 128, 114, 0.65]);//arr[3] if present is alpha 
 ```
 
 
-### All constructed colors
+#### All constructed colors
 No matter how the color is constructed, it is normalized to always contain r, g, and b values. For example:
 
 ```javascript 
@@ -110,7 +107,7 @@ These return new color instances and do not modify the original color. The ratio
 
 The examples show hsl objects in places for clarity, but the color instance actually returned will not have these channel values unless you call color.hsl or color.hsv.
 
-###hue (aka rotate)
+### hue (aka rotate)
 ```javascript
 //accepts an int up to 359
 //changes hue of a color
@@ -119,6 +116,7 @@ color.hue(deg);//color.rotate is an alias for hue
 ```
 
 ### mix (aka blend)
+Mix 2 colors together
 ```javascript
 //color2 can be a single color constructor (array, hex, rgbString, etc)
 //examples using grayscale for simplicity  
@@ -128,21 +126,19 @@ color.mix(color2, 0.25).rgb;//-->[125,125,125]
 color2.mix(color, 0.25).rgb;//-->[175,175,175]
 ```
 ### saturate/desaturate/grayscale
+increase or decrease saturation by the specified ratio
 ```javascript
-//increase saturation by specified ratio
 color.saturate(0.3);//{h:10,s:50,l:50}->{h:10,s:65,l:50}
-
-//decrease saturation by specified ratio
 color.desaturate(0.3);//{h:10,s:50,l:50}->{h:10,s:35,l:50}
 
 //grayscale() is shorthand for desaturate(1);
 color.grayscale();//{h:10,s:50,l:50}->{h:10,s:0,l:50}
 ```
+
 ### darken/lighten
 Increase lightness or darkness by specified ratio 
 ```javascript
 color.lighten(0.3);//{h:10,s:50,l:50} -> {h:10,s:50,l:65}
-
 color.darken(0.3);//{h:10,s:50,l:50} -> {h:10,s:50,l:35}
 ```
 ### fadeIn/fadeOut

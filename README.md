@@ -2,6 +2,8 @@
 
 An ES6+ color class that simplifies color parsing and conversion as well as most common color functions. To visually see the channels of a color, see [this demo](http://preview.thewebkid.com/modules/v-cpicker).
  
+[Raw Gist](https://gist.github.com/thewebkid/e3a1c969564256aeaf6f5137d03fa401)
+ 
 ## Installation
     npm i --save modern-color
 

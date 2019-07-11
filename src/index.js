@@ -517,7 +517,7 @@ export class Color {
   }
   negate(){
     let rgb = this.rgb.map(c => 255 - c);
-    if (a !== undefined){
+    if (this.a !== undefined){
       rgb.push(this.alpha);
     }
     return Color.fromArray(rgb);

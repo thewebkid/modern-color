@@ -334,10 +334,13 @@ export class Color {
   get rgbString() {
     return `rgba(${this.rgba.join(',')})`;
   }
+  get rgbaString() {//alias
+    return this.rgbString;
+  }
   get hex() {
     return `#${this.rgb.map(v => v.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
   }
-  get hexa() {
+  get hexa() {//alias
     return this.rgbaHex;
   }
   get rgbaHex() {

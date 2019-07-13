@@ -14,14 +14,12 @@ An ES6+ color class that simplifies color parsing and conversion as well as most
 The below all return color objects with identical r, g, and b values - they only differ in how they were constructed.
 ### named colors
 ```javascript
-//named
 const colorNamed = new Color('salmon');
 const colorNamed = new Color('salmon', 0.65); //alpha channel as 2nd param
 ```
 
 ### (string) hex, rgbaHex, rgb() 
 ```javascript
-//hexadecimal
 const colorHex = new Color('#FA8072')
 // add alpha channel
 const colorHex = new Color('#FA8072', 0.65); //alpha as 2nd param
@@ -72,28 +70,27 @@ console.log(c.hsl, c.rgb);
 
 ### rgb, rgba (Array)
 ```javascript
-/*** Getters ***/
-console.log(color.rgb);// array
+console.log(color.rgb);
 // [250, 128, 114]
-console.log(color.rgba);// array
+console.log(color.rgba);
 // [250, 128, 114, 1]
 ```
 ### rgb, hsl, hsv (Object)
 ```javascript
-console.log(color.rgbObj);// object
+console.log(color.rgbObj);
 //{r:250, g:128, b:114, a:0.65} || {r:250, g:128, b:114, a:1}
-console.log(color.hsl);//object
+console.log(color.hsl);
 // {h:6, s:93, l:71}
-console.log(color.hsv);//object
+console.log(color.hsv);
 // {h:6, s:54, v:98}
 ```
 ### hex, rgbString, rgbaHex (String)
 ```javascript
-console.log(color.hex);//string
+console.log(color.hex);
 //#FA8072 - no alpha channel
-console.log(color.rgbaHex);// string
+console.log(color.rgbaHex);
 //#FA8072A6 (#RRGGBBAA) - color.hexa is an alias for rgbaHex
-console.log(color.rgbString);//string
+console.log(color.rgbString);
 // `rgba(250, 128, 114, 0.65) || rgba(250, 128, 114, 1)
 // always returns rgba with alpha channel defaulting to 1
 ```
@@ -128,24 +125,24 @@ Mix 2 colors together
 //examples using grayscale for simplicity  
 color = new Color([100,100,100]);
 color2 = new Color([200,200,200]);
-color.mix(color2, 0.25).rgb;//-->[125,125,125]
-color2.mix(color, 0.25).rgb;//-->[175,175,175]
+color.mix(color2, 0.25).rgb;//-->[125, 125, 125]
+color2.mix(color, 0.25).rgb;//-->[175, 175, 175]
 ```
 ### saturate/desaturate/grayscale
 increase or decrease saturation by the specified ratio
 ```javascript
-color.saturate(0.3);//{h:10,s:50,l:50}->{h:10,s:65,l:50}
-color.desaturate(0.3);//{h:10,s:50,l:50}->{h:10,s:35,l:50}
+color.saturate(0.3);//{h:10, s:50, l:50} -> {h:10, s:65, l:50}
+color.desaturate(0.3);//{h:10, s:50, l:50} -> {h:10, s:35, l:50}
 
 //grayscale() is shorthand for desaturate(1);
-color.grayscale();//{h:10,s:50,l:50}->{h:10,s:0,l:50}
+color.grayscale();//{h:10, s:50, l:50}->{h:10, s:0, l:50}
 ```
 
 ### darken/lighten
 Increase lightness or darkness by specified ratio 
 ```javascript
-color.lighten(0.3);//{h:10,s:50,l:50} -> {h:10,s:50,l:65}
-color.darken(0.3);//{h:10,s:50,l:50} -> {h:10,s:50,l:35}
+color.lighten(0.3);//{h:10, s:50, l:50} -> {h:10, s:50, l:65}
+color.darken(0.3);//{h:10, s:50, l:50} -> {h:10, s:50, l:35}
 ```
 ### fadeIn/fadeOut
 Increase opacity or transparency by a given ratio. 
@@ -159,7 +156,7 @@ color.fadeOut(0.5);//{r:0, g:0, b:0, a:0.5}->{r:0, g:0, b:0, a:0.25}
 ### negate
 Subtract r, g, and b channel values from max (255) 
 ```javascript
-color.negate();//{r:0, g:128, b:200}->{r:255,g:127,b:55}
+color.negate(); //{r:0, g:128, b:200}->{r:255, g:127, b:55}
 ```
 
 Obviously many well-known public algorithms and functions are involved here. I built this class to help me write a [layered css gradient tool](http://preview.thewebkid.com/gradients) (linear, radial, and conic). I think this architecture might be useful to other developers. Please let me know if you find bugs or if you want to share something awesome you created!

@@ -1,6 +1,6 @@
 # modern-color (ES6+ color class)  [![npm version](https://badge.fury.io/js/modern-color.svg)](https://badge.fury.io/js/modern-color) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An ES6+ color class that simplifies color parsing and conversion as well as most common color functions. To visually see the channels of a color, see [this demo](http://preview.thewebkid.com/modules/v-cpicker).
+An ES6+ color class that simplifies color parsing and conversion as well as most common color functions. To visually see the channels (rgb / hsl / hsv / alpha) of a color, see [this demo](http://preview.thewebkid.com/modules/v-cpicker).
  
 [Raw Gist](https://gist.github.com/thewebkid/e3a1c969564256aeaf6f5137d03fa401)
  
@@ -11,46 +11,48 @@ An ES6+ color class that simplifies color parsing and conversion as well as most
     import {Color} from "modern-color";
   
 ## Parsing examples (constructors)
-The below all return color objects with identical r, g, and b values - they only differ in how they were constructed.
+The below all return color class instances with identical r, g, and b values - they only differ in how they were constructed.
+ 
+You can use new Color(constructor) or Color.parse(constructor). 
 ### named colors
 ```javascript
-const colorNamed = new Color('salmon');
-const colorNamed = new Color('salmon', 0.65); //alpha channel as 2nd param
+const colorNamed = Color.parse('salmon');
+const colorNamed = Color.parse('salmon', 0.65); //alpha channel as 2nd param
 ```
 
 ### (string) hex, rgbaHex, rgb() 
 ```javascript
-const colorHex = new Color('#FA8072')
+const colorHex = Color.parse('#FA8072')
 // add alpha channel
-const colorHex = new Color('#FA8072', 0.65); //alpha as 2nd param
+const colorHex = Color.parse('#FA8072', 0.65); //alpha as 2nd param
 // -or last 2 hex chars-
-const rgbaHex = new Color('#FA8072A6');//rgba hex
+const rgbaHex = Color.parse('#FA8072A6');//rgba hex
 
-const fromCssString = new Color('rgba(250, 128, 114, 0.65)');
-const fromCssString = new Color('rgb(250, 128, 114)');
+const fromCssString = Color.parse('rgba(250, 128, 114, 0.65)');
+const fromCssString = Color.parse('rgb(250, 128, 114)');
 ```
 
 ### (number params) r, b, g, a 
 ```javascript
-const colorFromParams = new Color(250, 128, 114);
-const colorFromParams = new Color(250, 128, 114, 0.65);//w/alpha
+const colorFromParams = Color.parse(250, 128, 114);
+const colorFromParams = Color.parse(250, 128, 114, 0.65);//w/alpha
 ```
 
 ### (object) rgb, hsl, and hsv  
 ```javascript
-const colorRGB = new Color({r:250, g:128, b:114});
-const colorHsl = new Color({h:6, s:93, l:71});
-const colorHsv = new Color({h:6, s:54, v:98});
+const colorRGB = Color.parse({r:250, g:128, b:114});
+const colorHsl = Color.parse({h:6, s:93, l:71});
+const colorHsv = Color.parse({h:6, s:54, v:98});
 //with alpha
-const colorRGB = new Color({r:250, g:128, b:114, a:0.65});
-const colorHsl = new Color({h:6, s:93, l:71, a:0.65});
-const colorHsv = new Color({h:6, s:54, v:98, a:0.65});
+const colorRGB = Color.parse({r:250, g:128, b:114, a:0.65});
+const colorHsl = Color.parse({h:6, s:93, l:71, a:0.65});
+const colorHsv = Color.parse({h:6, s:54, v:98, a:0.65});
 ```
 
 ### (array) rgb and rgba
 ```javascript
-const colorFromArray = new Color([250, 128, 114]);
-const colorFromArray = new Color([250, 128, 114, 0.65]);//arr[3] if present is alpha 
+const colorFromArray = Color.parse([250, 128, 114]);
+const colorFromArray = Color.parse([250, 128, 114, 0.65]);//arr[3] if present is alpha 
 ```
 
 
@@ -58,7 +60,7 @@ const colorFromArray = new Color([250, 128, 114, 0.65]);//arr[3] if present is a
 No matter how the color is constructed, it is normalized to always contain r, g, and b values. For example:
 
 ```javascript 
-const c = new Color({h:1, s:100, l:50});
+const c = Color.parse({h:1, s:100, l:50});
 const {r, g, b} = c;
 console.log({r, g, b});
 c.b = 255;
@@ -123,8 +125,8 @@ Mix 2 colors together
 ```javascript
 //color2 can be a single color constructor (array, hex, rgbString, etc)
 //examples using grayscale for simplicity  
-color = new Color([100,100,100]);
-color2 = new Color([200,200,200]);
+color = Color.parse([100,100,100]);
+color2 = Color.parse([200,200,200]);
 color.mix(color2, 0.25).rgb;//-->[125, 125, 125]
 color2.mix(color, 0.25).rgb;//-->[175, 175, 175]
 ```

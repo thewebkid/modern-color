@@ -170,6 +170,22 @@ export const namedColors = {
 
 export class Color {
   constructor(input, g, b, a) {
+    if (Color.isBaseConstructor(input)) {
+        this.r = colorByte(input.r);
+        this.g = colorByte(input.g);
+        this.b = colorByte(input.b);
+        if (input.a !== undefined) {
+          this.a = toFlt(input.a);
+        }
+        return this;
+    }else{
+      return Color.parse(input,g,b,a);
+    }
+  }
+  static parse(input,g,b,a){
+    if (Color.isBaseConstructor(input)){
+      return new Color(input);
+    }
     if (g !== undefined && b !== undefined) {
       this.r = colorByte(input);
       this.g = colorByte(g);
@@ -196,15 +212,7 @@ export class Color {
         return Color.fromArray([randomByte(), randomByte(), randomByte()]);
       }
     } else if (typeof input === 'object') {
-      if (input.constructor && input.constructor.name === 'Color' &&
-        input.r !== undefined && input.g !== undefined && input.b !== undefined) {
-        return input;
-      }
-      if (input.r !== undefined) {
-        this.r = colorByte(input.r);
-        this.g = colorByte(input.g);
-        this.b = colorByte(input.b);
-      }
+
       if (input.a !== undefined) {
         this.a = toFlt(input.a);
       }
@@ -223,6 +231,9 @@ export class Color {
       return this;
     }
     return Color.fromArray([0, 0, 0]);
+  }
+  static isBaseConstructor(input){
+    return typeof input === 'object' && (input.r !== undefined && input.g !== undefined && input.b !== undefined);
   }
   static fromNamed(colorName,a) {
     return Color.fromHex(namedColors[colorName.toLowerCase()], a);

@@ -482,29 +482,27 @@ export class Color {
     mixed[3] = byte2Float(mixed[3]);
     return Color.fromArray(mixed);
   }
-  lighten(ratio) {
+  adjustSatLum(channel,ratio,reverse){
     const hsl = this.hsl;
-    hsl.l = maxVal(100, hsl.l + (100 - hsl.l) * ratio);
+    let val = hsl[channel];
+    let incrementBy =  val - (100 - val) * ratio;
+    hsl[channel] = reverse ?
+      maxVal(100, val - incrementBy)  :
+      maxVal(100, val + incrementBy);
     hsl.a = this.a;
     return new Color(hsl);
+  }
+  lighten(ratio, reverse=false) {
+    return this.adjustSatLum('l',ratio,reverse);
   }
   darken(ratio) {
-    const hsl = this.hsl;
-    hsl.l = maxVal(100, hsl.l - (100 - hsl.l) * ratio);
-    hsl.a = this.a;
-    return new Color(hsl);
+    return this.lighten(ratio,true);
   }
-  saturate(ratio) {
-    const hsl = this.hsl;
-    hsl.s = maxVal(100, hsl.s + (100 - hsl.s) * ratio);
-    hsl.a = this.a;
-    return new Color(hsl);
+  saturate(ratio, reverse=false) {
+    return this.adjustSatLum('s', ratio, reverse);
   }
   desaturate(ratio) {
-    const hsl = this.hsl;
-    hsl.s = maxVal(100, hsl.s - (100 - hsl.s) * ratio);
-    hsl.a = this.a;
-    return new Color(hsl);
+    return this.saturate(ratio,true);
   }
   grayscale() {
     return this.desaturate(1);
@@ -522,12 +520,12 @@ export class Color {
   fadeIn(ratio) {
     let a = this.a || 1;
     const {r, g, b} = this;
-    return Color.fromArray([r, g, b, a + a * ratio]);
+    return Color.fromArray([r, g, b, a + (1-a) * ratio]);
   }
   fadeOut(ratio) {
     let a = this.a || 1;
     const {r, g, b} = this;
-    return Color.fromArray([r, g, b, a - a * ratio]);
+    return Color.fromArray([r, g, b, a - (1 - a) * ratio]);
   }
   negate(){
     let rgb = this.rgb.map(c => 255 - c);

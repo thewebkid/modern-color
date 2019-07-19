@@ -485,7 +485,7 @@ export class Color {
   adjustSatLum(channel,ratio,reverse){
     const hsl = this.hsl;
     let val = hsl[channel];
-    let incrementBy =  val - (100 - val) * ratio;
+    let incrementBy =  (100 - val) * ratio;
     hsl[channel] = reverse ?
       maxVal(100, val - incrementBy)  :
       maxVal(100, val + incrementBy);
@@ -502,7 +502,7 @@ export class Color {
     return this.adjustSatLum('s', ratio, reverse);
   }
   desaturate(ratio) {
-    return this.saturate(ratio,true);
+    return this.saturate(ratio, true);
   }
   grayscale() {
     return this.desaturate(1);

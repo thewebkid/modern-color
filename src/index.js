@@ -484,25 +484,25 @@ export class Color {
   }
   lighten(ratio) {
     const hsl = this.hsl;
-    hsl.l = maxVal(100, hsl.l + hsl.l * ratio);
+    hsl.l = maxVal(100, hsl.l + (100 - hsl.l) * ratio);
     hsl.a = this.a;
     return new Color(hsl);
   }
   darken(ratio) {
     const hsl = this.hsl;
-    hsl.l = maxVal(100, hsl.l - hsl.l * ratio);
+    hsl.l = maxVal(100, hsl.l - (100 - hsl.l) * ratio);
     hsl.a = this.a;
     return new Color(hsl);
   }
   saturate(ratio) {
     const hsl = this.hsl;
-    hsl.s = maxVal(100, hsl.s + hsl.s * ratio);
+    hsl.s = maxVal(100, hsl.s + (100 - hsl.s) * ratio);
     hsl.a = this.a;
     return new Color(hsl);
   }
   desaturate(ratio) {
     const hsl = this.hsl;
-    hsl.s = maxVal(100, hsl.s - hsl.s * ratio);
+    hsl.s = maxVal(100, hsl.s - (100 - hsl.s) * ratio);
     hsl.a = this.a;
     return new Color(hsl);
   }

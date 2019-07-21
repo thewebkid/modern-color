@@ -479,21 +479,20 @@ export class Color {
       // add or subtract from lc based on reverse mode
       return reverse ? lc - diffRatio : diffRatio + lc;
     });
+    // noinspection JSValidateTypes
     mixed[3] = byte2Float(mixed[3]);
     return Color.fromArray(mixed);
   }
-  adjustSatLum(channel,ratio,reverse){
+  adjustSatLum(chan, ratio, reverse){
     const hsl = this.hsl;
-    let val = hsl[channel];
-    let incrementBy =  (100 - val) * ratio;
-    hsl[channel] = reverse ?
-      maxVal(100, val - incrementBy)  :
-      maxVal(100, val + incrementBy);
+    let val = hsl[chan];
+    let incrementBy =  (reverse ? val : 100 - val) * ratio;
+    hsl[chan] = maxVal(100, reverse ? val - incrementBy : val + incrementBy);
     hsl.a = this.a;
     return new Color(hsl);
   }
   lighten(ratio, reverse=false) {
-    return this.adjustSatLum('l',ratio,reverse);
+    return this.adjustSatLum('l', ratio, reverse);
   }
   darken(ratio) {
     return this.lighten(ratio,true);

@@ -171,13 +171,13 @@ export const namedColors = {
 export class Color {
   constructor(input, g, b, a) {
     if (Color.isBaseConstructor(input)) {
-        this.r = colorByte(input.r);
-        this.g = colorByte(input.g);
-        this.b = colorByte(input.b);
-        if (input.a !== undefined) {
-          this.a = toFlt(input.a);
-        }
-        return this;
+      this.r = colorByte(input.r);
+      this.g = colorByte(input.g);
+      this.b = colorByte(input.b);
+      if (input.a !== undefined) {
+        this.a = toFlt(input.a);
+      }
+      return this;
     }else{
       return Color.parse(input,g,b,a);
     }
@@ -187,13 +187,13 @@ export class Color {
       return new Color(input);
     }
     if (g !== undefined && b !== undefined) {
-      this.r = colorByte(input);
-      this.g = colorByte(g);
-      this.b = colorByte(b);
-      if (this.a !== undefined) {
-        this.a = toFlt(a);
+      let r = colorByte(input);
+      g = colorByte(g);
+      b = colorByte(b);
+      if (a !== undefined) {
+        a = toFlt(a);
       }
-      return this;
+      return new Color({r,g,b,a});
     }
     if (Array.isArray(input)) {
       return Color.fromArray(input);
@@ -515,16 +515,15 @@ export class Color {
     hsl.a = this.a;
     return new Color(hsl);
   }
-
-  fadeIn(ratio) {
-    let a = this.a || 1;
+  fadeIn(ratio,reverse) {
+    let a = this.alpha;
     const {r, g, b} = this;
-    return Color.fromArray([r, g, b, a + (1-a) * ratio]);
+    let incr = (1 - a) * ratio;
+    a = reverse ? a-incr : a+incr;
+    return Color({r, g, b, a});
   }
   fadeOut(ratio) {
-    let a = this.a || 1;
-    const {r, g, b} = this;
-    return Color.fromArray([r, g, b, a - (1 - a) * ratio]);
+    this.fadeIn(ratio,true);
   }
   negate(){
     let rgb = this.rgb.map(c => 255 - c);

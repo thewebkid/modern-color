@@ -70,14 +70,14 @@ console.log(c.hsl, c.rgb);
 
 ## Formats (property getters)
 
-### rgb, rgba (Array)
+### (array) rgb, rgba 
 ```javascript
 console.log(color.rgb);
 // [250, 128, 114]
 console.log(color.rgba);
 // [250, 128, 114, 1]
 ```
-### rgb, hsl, hsv (Object)
+### (object) rgb, hsl, hsv
 ```javascript
 console.log(color.rgbObj);
 //{r:250, g:128, b:114, a:0.65} || {r:250, g:128, b:114, a:1}
@@ -86,7 +86,7 @@ console.log(color.hsl);
 console.log(color.hsv);
 // {h:6, s:54, v:98}
 ```
-### hex, rgbString, rgbaHex (String)
+### (string) hex, rgbString, rgbaHex 
 ```javascript
 console.log(color.hex);
 //#FA8072 - no alpha channel

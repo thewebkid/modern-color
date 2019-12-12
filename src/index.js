@@ -345,7 +345,7 @@ export class Color {
     r = float2Byte(r);
     g = float2Byte(g);
     b = float2Byte(b);
-  
+
   if (a) return new Color( { r,b,g,a:toFlt(a) } )
   else   return new Color( { r,b,g } );
   }
@@ -454,7 +454,7 @@ export class Color {
   }
   // (rr01) 2019-08-05 New color conversion RGB(a) to CMYK(a)
   get cmyk(){
-    var c,m,y,k;
+    let c,m,y,k;
 
     const r = parseFloat(this.r)/255.0;
     const g = parseFloat(this.g)/255.0;
@@ -462,7 +462,7 @@ export class Color {
 
     k = 1-Math.max(r,g,b);
 
-    if (k==1) c=m=y=0;
+    if (k===1) c=m=y=0;
     else {
       c = (1-r-k)/(1-k);
       m = (1-g-k)/(1-k);
@@ -474,7 +474,7 @@ export class Color {
     y = Math.round(100*y);
     k = Math.round(100*k);
 
-  if (this.alpha) return { c,m,y,k,a: this.alpha }
+  if (this.alpha) return { c,m,y,k,a: this.alpha };
   else            return { c,m,y,k };
   }
 

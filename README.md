@@ -38,15 +38,17 @@ const colorFromParams = Color.parse(250, 128, 114);
 const colorFromParams = Color.parse(250, 128, 114, 0.65);//w/alpha
 ```
 
-### (object) rgb, hsl, and hsv  
+### (object) rgb, hsl, hsv, and cmyk  
 ```javascript
 const colorRGB = Color.parse({r:250, g:128, b:114});
 const colorHsl = Color.parse({h:6, s:93, l:71});
 const colorHsv = Color.parse({h:6, s:54, v:98});
+const colorCmyk = Color.parse({c:0, m:49, y:54, k:2});
 //with alpha
 const colorRGB = Color.parse({r:250, g:128, b:114, a:0.65});
 const colorHsl = Color.parse({h:6, s:93, l:71, a:0.65});
 const colorHsv = Color.parse({h:6, s:54, v:98, a:0.65});
+const colorCmyk = Color.parse({c:0, m:49, y:54, k:2, a:0.65});
 ```
 
 ### (array) rgb and rgba
@@ -77,7 +79,7 @@ console.log(color.rgb);
 console.log(color.rgba);
 // [250, 128, 114, 1]
 ```
-### (object) rgb, hsl, hsv
+### (object) rgb, hsl, hsv, cmyk [alpha chan: rgba, hsla, hsva, cmyka]
 ```javascript
 console.log(color.rgbObj);
 //{r:250, g:128, b:114, a:0.65} || {r:250, g:128, b:114, a:1}
@@ -85,6 +87,8 @@ console.log(color.hsl);
 // {h:6, s:93, l:71}
 console.log(color.hsv);
 // {h:6, s:54, v:98}
+console.log(color.cmyk);
+//{c:0, m:49, y:54, k:2}
 ```
 ### (string) hex, rgbString, rgbaHex 
 ```javascript
@@ -101,8 +105,8 @@ console.log(color.rgbString);
 ```javascript
 console.log(color.alpha);//this.a or 1 if undefined
 
-//not a getter, but can return 5 different formats
-//'rgb', 'hex', 'rgbaHex', 'hsl', 'hsla' 
+//not a getter, but can return 7 different formats
+//'rgb', 'hex', 'rgbaHex', 'hsl', 'hsla', cmyk, cmyka 
 console.log(color.toString(format));
 
 ```

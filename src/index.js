@@ -179,10 +179,10 @@ export class Color {
       }
       return this;
     }else{
-      return Color.parse(input,g,b,a);
+      return Color.parse(input, g, b, a);
     }
   }
-  static parse(input,g,b,a){
+  static parse(input, g, b, a){
     if (Color.isBaseConstructor(input)){
       return new Color(input);
     }
@@ -193,7 +193,7 @@ export class Color {
       if (a !== undefined) {
         a = toFlt(a);
       }
-      return new Color({r,g,b,a});
+      return new Color({r, g, b, a});
     }
     if (Array.isArray(input)) {
       return Color.fromArray(input);
@@ -239,7 +239,7 @@ export class Color {
   static isBaseConstructor(input){
     return typeof input === 'object' && (input.r !== undefined && input.g !== undefined && input.b !== undefined);
   }
-  static fromNamed(colorName,a) {
+  static fromNamed(colorName, a) {
     return Color.fromHex(namedColors[colorName.toLowerCase()], a);
   }
   static fromArray(input) {
@@ -331,7 +331,7 @@ export class Color {
   }
   // (rr01) 2019-08-05 New color conversion CMYK(a) to RGB(a)
   static fromCMYK( {c, m, y, k, a} ){
-    let r=0,g=0,b=0;
+    let r = 0, g = 0, b = 0;
 
     c /= 100;
     m /= 100;
@@ -346,8 +346,8 @@ export class Color {
     g = float2Byte(g);
     b = float2Byte(b);
 
-  if (a) return new Color( { r,b,g,a:toFlt(a) } )
-  else   return new Color( { r,b,g } );
+    if (a) return new Color( { r, b, g, a:toFlt(a) } );
+    else   return new Color( { r, b, g } );
   }
 
   /** Getters **/
@@ -454,28 +454,28 @@ export class Color {
   }
   // (rr01) 2019-08-05 New color conversion RGB(a) to CMYK(a)
   get cmyk(){
-    let c,m,y,k;
+    let c, m, y, k;
 
-    const r = parseFloat(this.r)/255.0;
-    const g = parseFloat(this.g)/255.0;
-    const b = parseFloat(this.b)/255.0;
+    const r = parseFloat(this.r) / 255.0;
+    const g = parseFloat(this.g) / 255.0;
+    const b = parseFloat(this.b) / 255.0;
 
-    k = 1-Math.max(r,g,b);
+    k = 1 - Math.max(r, g, b);
 
-    if (k===1) c=m=y=0;
+    if (k === 1) c = m = y = 0;
     else {
-      c = (1-r-k)/(1-k);
-      m = (1-g-k)/(1-k);
-      y = (1-b-k)/(1-k);
+      c = (1 - r - k) / (1 - k);
+      m = (1 - g - k) / (1 - k);
+      y = (1 - b - k) / (1 - k);
     }
 
-    c = Math.round(100*c);
-    m = Math.round(100*m);
-    y = Math.round(100*y);
-    k = Math.round(100*k);
+    c = Math.round(100 * c);
+    m = Math.round(100 * m);
+    y = Math.round(100 * y);
+    k = Math.round(100 * k);
 
-  if (this.alpha) return { c,m,y,k,a: this.alpha };
-  else            return { c,m,y,k };
+    if (this.alpha) return { c, m, y, k, a: this.alpha };
+    else            return { c, m, y, k };
   }
 
   get hslString() {
@@ -559,13 +559,13 @@ export class Color {
     hsl.a = this.a;
     return new Color(hsl);
   }
-  lighten(ratio, reverse=false) {
+  lighten(ratio, reverse = false) {
     return this.adjustSatLum('l', ratio, reverse);
   }
   darken(ratio) {
-    return this.lighten(ratio,true);
+    return this.lighten(ratio, true);
   }
-  saturate(ratio, reverse=false) {
+  saturate(ratio, reverse = false) {
     return this.adjustSatLum('s', ratio, reverse);
   }
   desaturate(ratio) {
@@ -583,15 +583,15 @@ export class Color {
     hsl.a = this.a;
     return new Color(hsl);
   }
-  fadeIn(ratio,reverse) {
+  fadeIn(ratio, reverse) {
     let a = this.alpha;
     const {r, g, b} = this;
     let incr = (1 - a) * ratio;
-    a = reverse ? a-incr : a+incr;
+    a = reverse ? a - incr : a + incr;
     return Color({r, g, b, a});
   }
   fadeOut(ratio) {
-    this.fadeIn(ratio,true);
+    this.fadeIn(ratio, true);
   }
   negate(){
     let rgb = this.rgb.map(c => 255 - c);

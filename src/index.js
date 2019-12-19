@@ -365,11 +365,17 @@ export class Color {
     let {r, g, b} = this;
     return {r, g, b, a:this.alpha};
   }
+  get css(){
+    return this.rgbString;
+  }
   get rgbString() {
+    if (this.a === undefined){
+      return `rgb(${this.rgb.join(',')})`;
+    }
     return `rgba(${this.rgba.join(',')})`;
   }
   get rgbaString() {//alias
-    return this.rgbString;
+    return `rgba(${this.rgba.join(',')})`;
   }
   get hex() {
     return `#${this.rgb.map(v => v.toString(16).padStart(2, '0')).join('')}`.toUpperCase();

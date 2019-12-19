@@ -1,15 +1,15 @@
 {
   "name": "modern-color",
-  "version": "0.4.2",
+  "version": "1.0.0",
   "main": "src/index.js",
   "author": "Ron Gilchrist (thewebkid)",
-  "description": "An ES6+ color class that simplifies color parsing and conversion as well as most common color functions.",
+  "description": "An ES2019+ color class that simplifies color parsing and conversion. Implements most common color functions.",
   "keywords": [
-    "color",
-    "colors",
-    "js",
+    "colors","rgb","hsl","hsv","cmyk",
+    "js","color",
     "ES6",
-    "ES7"
+    "ES2017",
+    "ES2019"
   ],
   "license": "MIT",
   "files": [

@@ -1,118 +1,84 @@
-# modern-color (ES6+ color class)  [![npm version](https://badge.fury.io/js/modern-color.svg)](https://badge.fury.io/js/modern-color) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# modern-color (ES2019+ color class)  [![npm version](https://badge.fury.io/js/modern-color.svg)](https://badge.fury.io/js/modern-color) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An ES6+ color class that simplifies color parsing and conversion as well as most common color functions. To visually see the channels (rgb / hsl / hsv / alpha) of a color, see [this demo](http://preview.thewebkid.com/modules/v-cpicker).
- 
+An ES2019 color class that simplifies color parsing and conversion as well as most common color functions. To visually see the channels (rgb / hsl / hsv / alpha) of a color, see [this demo](http://preview.thewebkid.com/modules/v-cpicker).
+
 [Raw Gist](https://gist.github.com/thewebkid/e3a1c969564256aeaf6f5137d03fa401)
- 
+
 ## Installation
     npm i --save modern-color
 
-### Initialize 
+### Initialize
     import {Color} from "modern-color";
-  
+
 ## Parsing examples (constructors)
 The below all return color class instances with identical r, g, and b values - they only differ in how they were constructed.
- 
-You can use new Color(constructor) or Color.parse(constructor). 
-### named colors
-```javascript
-const colorNamed = Color.parse('salmon');
-const colorNamed = Color.parse('salmon', 0.65); //alpha channel as 2nd param
-```
 
-### (string) hex, rgbaHex, rgb() 
-```javascript
-const colorHex = Color.parse('#FA8072')
-// add alpha channel
-const colorHex = Color.parse('#FA8072', 0.65); //alpha as 2nd param
-// -or last 2 hex chars-
-const rgbaHex = Color.parse('#FA8072A6');//rgba hex
+You can use new Color(constructor) or Color.parse(constructor). The alpha channel is optional in all formats (defaults to 1). This document assumes you are familiar with color min / max values per channel. [Read more about colors](https://www.w3schools.com/css/css3_colors.asp).
 
-const fromCssString = Color.parse('rgba(250, 128, 114, 0.65)');
-const fromCssString = Color.parse('rgb(250, 128, 114)');
-```
+CYMK is supported in this module, but is not supported by any browsers currently. Thanks to [renevanderlende](https://github.com/renevanderlende) for implementing this contribution.
 
-### (number params) r, b, g, a 
-```javascript
-const colorFromParams = Color.parse(250, 128, 114);
-const colorFromParams = Color.parse(250, 128, 114, 0.65);//w/alpha
-```
-
-### (object) rgb, hsl, hsv, and cmyk  
-```javascript
-const colorRGB = Color.parse({r:250, g:128, b:114});
-const colorHsl = Color.parse({h:6, s:93, l:71});
-const colorHsv = Color.parse({h:6, s:54, v:98});
-const colorCmyk = Color.parse({c:0, m:49, y:54, k:2});
-//with alpha
-const colorRGB = Color.parse({r:250, g:128, b:114, a:0.65});
-const colorHsl = Color.parse({h:6, s:93, l:71, a:0.65});
-const colorHsv = Color.parse({h:6, s:54, v:98, a:0.65});
-const colorCmyk = Color.parse({c:0, m:49, y:54, k:2, a:0.65});
-```
-
-### (array) rgb and rgba
-```javascript
-const colorFromArray = Color.parse([250, 128, 114]);
-const colorFromArray = Color.parse([250, 128, 114, 0.65]);//arr[3] if present is alpha 
-```
+| Constructor    | Example    | Comments                                                |
+|:---------------|:-----------|:--------------------------------------------------------|
+| [named color](https://www.w3schools.com/colors/colors_names.asp) | `Color.parse('salmon', [alpha])`  | Any known [HTML color name](https://www.w3schools.com/colors/colors_names.asp). <br>This package exports a namedColors object you can also utilize. |
+| hex | `Color.parse('#FA8072', [alpha])` | Will parse #RGB, #RRGGBB, and even #RRGGBBAA hexadecimal color formats.|
+| rgb (string) | `Color.parse('rgba(250, 128, 114, 0.65)')` | Standard CSS RGB format (either rgb or rgba) |
+| rgb (arguments) | `Color.parse(250, 128, 114, 0.65)` | Pass 3 or 4 (for alpha) numeric params as r, g, b, a |
+| rgb (object) | `Color.parse({r:250, g:128, b:114, a:0.65})` | Pass a single object param containing r, g, b, and optionally a values |
+| hsl (object) | `Color.parse({h:6, s:93, l:71, a:0.65})` | Pass a single object param containing h, s, l (hue, saturation, luminosity) and optionally a property values.  |
+| hsv (object) | `Color.parse({h:6, s:54, v:98, a:0.65})` | Pass a single object param containing h, s, v (hue, saturation, value) and optionally a property values.  |
+| cmyk (object) | `Color.parse({c:0, m:49, y:54, k:2, a:0.65})` | Pass a single object param containing c, m, y, k (cyan, magenta, yellow, black) and optionally a property values.  |
+| rgb (array) | `Color.parse([250, 128, 114, 0.65])` | Pass rgb values as a single array [r, g, b [, a]].  |
 
 
-#### All constructed colors
+### Note - Normalized colors
 No matter how the color is constructed, it is normalized to always contain r, g, and b values. For example:
 
-```javascript 
-const c = Color.parse({h:1, s:100, l:50});
-const {r, g, b} = c;
-console.log({r, g, b});
-c.b = 255;
-console.log(c.hsl, c.rgb);
+```javascript
+// our fishy example ('salmon') constructed with h,s,l
+const c = Color.parse({{h:6, s:93, l:71}); 
+
+//constructor channels not there! Use getter!
+console.log(c.h, c.hsl.h);//outputs: undefined, 6
+
+// only r, g, and b
+const {r, g, b} = c; 
+console.log({r, g, b});//{r:250, g:128, b:114}
+
+c.b = 255;// directly mutate the color - makes pink salmon!
+console.log(c.hsl, c.rgb); // {r:250, g:128, b:255}, {h:298, s:100, l:75}
  ```
 
-
 ## Formats (property getters)
+The example values are based on the same base color instance as above: `Color.parse('rgba(250, 128, 114, 0.65)')` or for no alpha `Color.parse('rgb(250, 128, 114)')`
 
-### (array) rgb, rgba 
-```javascript
-console.log(color.rgb);
-// [250, 128, 114]
-console.log(color.rgba);
-// [250, 128, 114, 1]
-```
-### (object) rgb, hsl, hsv, cmyk [alpha chan: rgba, hsla, hsva, cmyka]
-```javascript
-console.log(color.rgbObj);
-//{r:250, g:128, b:114, a:0.65} || {r:250, g:128, b:114, a:1}
-console.log(color.hsl);
-// {h:6, s:93, l:71}
-console.log(color.hsv);
-// {h:6, s:54, v:98}
-console.log(color.cmyk);
-//{c:0, m:49, y:54, k:2}
-```
-### (string) hex, rgbString, rgbaHex 
-```javascript
-console.log(color.hex);
-//#FA8072 - no alpha channel
-console.log(color.rgbaHex);
-//#FA8072A6 (#RRGGBBAA) - color.hexa is an alias for rgbaHex
-console.log(color.rgbString);
-// `rgba(250, 128, 114, 0.65) || rgba(250, 128, 114, 1)
-// always returns rgba with alpha channel defaulting to 1
-```
+| Getter               | Value Type | Example                                                 |
+|:---------------------|:-----------|:--------------------------------------------------------|
+| **rgb**              | _Array_    | `[250, 128, 114, 0.65]`                                 |
+| **rgba**             | _Array_    | `[250, 128, 114, 0.65]`                                 |
+| **rgbObj**           | _Object_   | `{r:250, g:128, b:114, a:0.65}`                         |
+| **hsl**              | _Object_   | `{h:6, s:93, l:71}`                                     |
+| **hsla**             | _Object_   | `{h:6, s:93, l:71, a:0.65}`                             |
+| **hsv**              | _Object_   | `{h:6, s:54, v:98}`                                     |
+| **hsva**             | _Object_   | `{h:6, s:54, v:98, a:0.65}`                             |
+| **cmyk**             | _Object_   | `{c:0, m:49, y:54, k:2}`                                |
+| **cmyka**            | _Object_   | `{c:0, m:49, y:54, k:2, a:0.65}`                        |
+| **css**              | _String_   | `rgba(250, 128, 114, 0.65)` or `rgb(250, 128, 114)`     |
+| **rgbString**        | _String_   | `rgba(250, 128, 114, 0.65)` or `rgb(250, 128, 114)`     |
+| **rgbaString**       | _String_   | `rgba(250, 128, 114, 0.65)` or `rgba(250, 128, 114, 1)` |
+| **hex**              | _String_   | `#FA8072`                                               |
+| **hexa**/**rgbaHex** | _String_   | `#FA8072A6`                                             |
+| **alpha**            | _String_   | `0.65` or defaults to `1` if no alpha channel           |
 
-### Misc (alpha, toString)
-```javascript
-console.log(color.alpha);//this.a or 1 if undefined
 
-//not a getter, but can return 7 different formats
-//'rgb', 'hex', 'rgbaHex', 'hsl', 'hsla', cmyk, cmyka 
+### toString(_format_)
+Accepts a format string ('rgb', 'hex', 'rgbaHex', 'hsl', 'hsla', 'cmyk', 'cmyka') which will return the equivalent of calling the corresponding getter. Defaults to rgb.
+```javascript
 console.log(color.toString(format));
 
 ```
 
 ## Color functions
-These return new color instances and do not modify the original color. The ratio param must be a float (min:0, max:1). 
+These functions return new color instances and do not modify the original color. The ratio param must be a float (min:0, max:1).
 
 The examples show hsl objects in places for clarity, but the color instance actually returned will not have these channel values unless you call color.hsl or color.hsv.
 
@@ -128,7 +94,7 @@ color.hue(deg);//color.rotate is an alias for hue
 Mix 2 colors together
 ```javascript
 //color2 can be a single color constructor (array, hex, rgbString, etc)
-//examples using grayscale for simplicity  
+//examples using grayscale for simplicity
 color = Color.parse([100,100,100]);
 color2 = Color.parse([200,200,200]);
 color.mix(color2, 0.25).rgb;//-->[125, 125, 125]
@@ -145,13 +111,13 @@ color.grayscale();//{h:10, s:50, l:50}->{h:10, s:0, l:50}
 ```
 
 ### darken/lighten
-Increase lightness or darkness by specified ratio 
+Increase lightness or darkness by specified ratio
 ```javascript
 color.lighten(0.3);//{h:10, s:50, l:50} -> {h:10, s:50, l:65}
 color.darken(0.3);//{h:10, s:50, l:50} -> {h:10, s:50, l:35}
 ```
 ### fadeIn/fadeOut
-Increase opacity or transparency by a given ratio. 
+Increase opacity or transparency by a given ratio.
 ```javascript
 //increase opacity (decrease transparency) by ratio
 color.fadeIn(0.5);//{r:0, g:0, b:0, a:0.5}->{r:0, g:0, b:0, a:0.75}
@@ -160,7 +126,7 @@ color.fadeIn(0.5);//{r:0, g:0, b:0, a:0.5}->{r:0, g:0, b:0, a:0.75}
 color.fadeOut(0.5);//{r:0, g:0, b:0, a:0.5}->{r:0, g:0, b:0, a:0.25}
 ```
 ### negate
-Subtract r, g, and b channel values from max (255) 
+Subtract r, g, and b channel values from max (255)
 ```javascript
 color.negate(); //{r:0, g:128, b:200}->{r:255, g:127, b:55}
 ```

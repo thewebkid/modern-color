@@ -11,11 +11,6 @@ An ES2019 color class that simplifies color parsing and conversion as well as mo
     import {Color} from "modern-color";
 
 ## Parsing examples (constructors)
-The below all return color class instances with identical r, g, and b values - they only differ in how they were constructed.
-
-You can use new Color(constructor) or Color.parse(constructor). The alpha channel is optional in all formats (defaults to 1). This document assumes you are familiar with color min / max values per channel. [Read more about colors](https://www.w3schools.com/css/css3_colors.asp).
-
-CYMK is supported in this module, but is not supported by any browsers currently. Thanks to [renevanderlende](https://github.com/renevanderlende) for implementing this contribution.
 
 | Constructor    | Example    | Comments                                                |
 |:---------------|:-----------|:--------------------------------------------------------|
@@ -23,25 +18,30 @@ CYMK is supported in this module, but is not supported by any browsers currently
 | hex | `Color.parse('#FA8072', [alpha])` | Will parse #RGB, #RRGGBB, and even #RRGGBBAA hexadecimal color formats.|
 | rgb (string) | `Color.parse('rgba(250, 128, 114, 0.65)')` | Standard CSS RGB format (either rgb or rgba) |
 | rgb (arguments) | `Color.parse(250, 128, 114, 0.65)` | Pass 3 or 4 (for alpha) numeric params as r, g, b, a |
-| rgb (object) | `Color.parse({r:250, g:128, b:114, a:0.65})` | Pass a single object param containing r, g, b, and optionally a values |
-| hsl (object) | `Color.parse({h:6, s:93, l:71, a:0.65})` | Pass a single object param containing h, s, l (hue, saturation, luminosity) and optionally a property values.  |
-| hsv (object) | `Color.parse({h:6, s:54, v:98, a:0.65})` | Pass a single object param containing h, s, v (hue, saturation, value) and optionally a property values.  |
-| cmyk (object) | `Color.parse({c:0, m:49, y:54, k:2, a:0.65})` | Pass a single object param containing c, m, y, k (cyan, magenta, yellow, black) and optionally a property values.  |
-| rgb (array) | `Color.parse([250, 128, 114, 0.65])` | Pass rgb values as a single array [r, g, b [, a]].  |
+| rgb (object) | `Color.parse({r:250, g:128, b:114, a:0.65})` | Pass a single object param containing r, g, b, <br>and optionally a (alpha) values |
+| hsl (object) | `Color.parse({h:6, s:93, l:71, a:0.65})` | Pass a single object param containing h, s, l <br>(hue, saturation, luminosity) and optionally a (alpha) property values.  |
+| hsv (object) | `Color.parse({h:6, s:54, v:98, a:0.65})` | Pass a single object param containing h, s, v <br>(hue, saturation, value) and optionally a (alpha) property values.  |
+| cmyk (object) | `Color.parse({c:0, m:49, y:54, k:2, a:0.65})` | Pass a single object param containing c, m, y, k <br>(cyan, magenta, yellow, black) and optionally a (alpha) property values.  |
+| rgb (array) | `Color.parse([250, 128, 114, 0.65])` | Pass rgb values as a 3 or 4 (if using alpha) member array [r, g, b [, a]].  |
 
+The above examples return color class instances with identical r, g, and b values - they only differ in how they were constructed.
+
+You can use new Color(constructor) or Color.parse(constructor). The alpha channel is optional in all formats (defaults to 1). This document assumes you are familiar with color min / max values per channel. [Read more about colors](https://www.w3schools.com/css/css3_colors.asp).
+
+CYMK is supported in this module, but is not supported by any browsers currently. Thanks to [renevanderlende](https://github.com/renevanderlende) for implementing this contribution.
 
 ### Note - Normalized colors
 No matter how the color is constructed, it is normalized to always contain r, g, and b values. For example:
 
 ```javascript
 // our fishy example ('salmon') constructed with h,s,l
-const c = Color.parse({{h:6, s:93, l:71}); 
+const c = Color.parse({{h:6, s:93, l:71});
 
 //constructor channels not there! Use getter!
 console.log(c.h, c.hsl.h);//outputs: undefined, 6
 
 // only r, g, and b
-const {r, g, b} = c; 
+const {r, g, b} = c;
 console.log({r, g, b});//{r:250, g:128, b:114}
 
 c.b = 255;// directly mutate the color - makes pink salmon!

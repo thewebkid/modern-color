@@ -1,30 +1,29 @@
 {
   "name": "modern-color",
-  "version": "1.0.0",
-  "main": "src/index.js",
+  "version": "1.0.2",
   "author": "Ron Gilchrist (thewebkid)",
   "description": "An ES2019+ color class that simplifies color parsing and conversion. Implements most common color functions.",
   "keywords": [
-    "colors","rgb","hsl","hsv","cmyk",
-    "js","color",
-    "ES6",
-    "ES2017",
-    "ES2019"
+    "colors",
+    "rgb",
+    "hsl",
+    "hsv",
+    "cmyk",
+    "js",
+    "color"
   ],
   "license": "MIT",
-  "files": [
-    "src/index.js"
-  ],
-  "scripts": {
-    "build": "bili --name index"
-  },
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/thewebkid/modern-color.git"
   },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
-    "bili": "^4.8.1",
-    "eslint": "^6.7.2",
-    "babel-eslint": "^10.0.3"
+    "babel-eslint": "^10.1.0",
+    "eslint": "^8.52.0"
   }
 }

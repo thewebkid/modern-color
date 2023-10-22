@@ -169,6 +169,9 @@ export const namedColors = {
 };
 
 export class Color {
+  r = 0;
+  b = 0;
+  g = 0;
   constructor(input, g, b, a) {
     if (Color.isBaseConstructor(input)) {
       this.r = colorByte(input.r);
@@ -208,11 +211,14 @@ export class Color {
         return Color.fromNamed(input, a);
       } else if (input.startsWith('rgb')) {
         return Color.fromRgbString(input);
+      } else if(input === 'transparent'){
+        let r,g,b,a;
+        r = g = b = a = 0;
+        return new Color({r, g, b, a});
       } else {
         return Color.fromArray([randomByte(), randomByte(), randomByte()]);
       }
     } else if (typeof input === 'object') {
-
       if (input.a !== undefined) {
         this.a = toFlt(input.a);
       }
@@ -228,7 +234,6 @@ export class Color {
         c.a = input.a !== undefined ? toFlt(input.a) : undefined;
         return new Color(c);
       }
-      // (rr01) 2019-08-05 New color conversion CMYK(a) to RGB(a)
       if (input.c !== undefined) {
         return Color.fromCMYK(input);
       }
@@ -329,25 +334,11 @@ export class Color {
       b: float2Byte(m + b)
     });
   }
-  // (rr01) 2019-08-05 New color conversion CMYK(a) to RGB(a)
-  static fromCMYK( {c, m, y, k, a} ){
-    let r = 0, g = 0, b = 0;
-
-    c /= 100;
-    m /= 100;
-    y /= 100;
-    k /= 100;
-
-    r = 1 - Math.min( 1, c * ( 1 - k ) + k );
-    g = 1 - Math.min( 1, m * ( 1 - k ) + k );
-    b = 1 - Math.min( 1, y * ( 1 - k ) + k );
-
-    r = float2Byte(r);
-    g = float2Byte(g);
-    b = float2Byte(b);
-
-    if (a) return new Color( { r, b, g, a:toFlt(a) } );
-    else   return new Color( { r, b, g } );
+  static fromCMYK({c, m, y, k, a}){
+    const chanCalc = ch => float2Byte(
+      1 - Math.min(1, (ch / 100) * (1 - k) + k)
+    );
+    return new Color({r:chanCalc(c), b:chanCalc(m), g:chanCalc(y), a});
   }
 
   /** Getters **/
@@ -357,7 +348,7 @@ export class Color {
   get rgb() {//simple rgb array
     return [this.r, this.g, this.b];
   }
-  get rgba() {//simple rgb array
+  get rgba() {//simple rgba array
 
     return [this.r, this.g, this.b, this.alpha];
   }
@@ -458,7 +449,7 @@ export class Color {
       a: this.alpha
     };
   }
-  // (rr01) 2019-08-05 New color conversion RGB(a) to CMYK(a)
+
   get cmyk(){
     let c, m, y, k;
 
@@ -480,8 +471,7 @@ export class Color {
     y = Math.round(100 * y);
     k = Math.round(100 * k);
 
-    if (this.alpha) return { c, m, y, k, a: this.alpha };
-    else            return { c, m, y, k };
+    return this.alpha ? { c, m, y, k, a: this.alpha } : { c, m, y, k };
   }
 
   get hslString() {
@@ -493,7 +483,6 @@ export class Color {
     return `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, ${hsl.a})`;
   }
 
-  // (rr01) 2019-08-05 New color conversion CMYK(a)
   get cmykString() {
     const cmyk = this.cmyk;
     return `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`;
@@ -504,7 +493,7 @@ export class Color {
   }
 
   /** Functions **/
-  toString(format = 'rgb') {// accepts rgb, rgbaHex, hex, hsl, hsla, (rr01) cmyk, cmyka
+  toString(format = 'rgb') {// accepts rgb, rgbaHex, hex, hsl, hsla, cmyk, cmyka
     let s;
     switch (format) {
       case 'rgb':
@@ -522,8 +511,6 @@ export class Color {
       case 'hsla':
         s = this.hslaString;
         break;
-
-      // (rr01) 2019-08-05 New color conversion CMYK(a)
       case 'cmyk':
         s = this.cmykString;
         break;
@@ -597,7 +584,7 @@ export class Color {
     return Color({r, g, b, a});
   }
   fadeOut(ratio) {
-    this.fadeIn(ratio, true);
+    return this.fadeIn(ratio, true);
   }
   negate(){
     let rgb = this.rgb.map(c => 255 - c);
@@ -607,3 +594,4 @@ export class Color {
     return Color.fromArray(rgb);
   }
 }
+

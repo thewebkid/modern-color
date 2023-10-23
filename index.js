@@ -169,9 +169,6 @@ export const namedColors = {
 };
 
 export class Color {
-  r = 0;
-  b = 0;
-  g = 0;
   constructor(input, g, b, a) {
     if (Color.isBaseConstructor(input)) {
       this.r = colorByte(input.r);

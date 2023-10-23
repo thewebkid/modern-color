@@ -1,6 +1,6 @@
-# modern-color (ES2019+ color class)  [![npm version](https://badge.fury.io/js/modern-color.svg)](https://badge.fury.io/js/modern-color) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# modern-color Color Parsing/Manipulation  [![npm version](https://badge.fury.io/js/modern-color.svg)](https://badge.fury.io/js/modern-color) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An ES2019 color class that simplifies color parsing and conversion as well as most common color functions. To visually see the channels (rgb / hsl / hsv / alpha) of a color, see [this demo](http://preview.thewebkid.com/modules/v-cpicker).
+A color lib (class) that simplifies color parsing and conversion as well as most common color functions. To visually see the channels (rgb / hsl / hsv / alpha) of a color, see [this demo](https://thewebkid.com/modules/v-cpicker).
 
 [Raw Gist](https://gist.github.com/thewebkid/e3a1c969564256aeaf6f5137d03fa401)
 
@@ -131,4 +131,4 @@ Subtract r, g, and b channel values from max (255)
 color.negate(); //{r:0, g:128, b:200}->{r:255, g:127, b:55}
 ```
 
-Obviously many well-known public algorithms and functions are involved here. I built this class to help me write a [layered css gradient tool](http://preview.thewebkid.com/gradients) (linear, radial, and conic). I think this architecture might be useful to other developers. Please let me know if you find bugs or if you want to share something awesome you created!
+Obviously many well-known public algorithms and functions are involved here. Hope you enjoy!

@@ -1,6 +1,6 @@
 {
   "name": "modern-color",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "author": "Ron Gilchrist (thewebkid)",
   "description": "An ES2019+ color class that simplifies color parsing and conversion. Implements most common color functions.",
   "keywords": [

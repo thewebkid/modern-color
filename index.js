@@ -2,7 +2,7 @@ const colorByte = v => maxVal(255, Math.round(Number(v)));
 const float2Byte = v => colorByte(v * 255);
 const byte2Float = v => maxVal(1, v / 255);
 const maxVal = (max, v) => Math.max(0, Math.min(max, v));
-const randomByte = () => Math.floor(Math.random() * 256);
+
 const toFlt = (v) => {
   if (v === undefined) {
     return 1;
@@ -213,7 +213,7 @@ export class Color {
         r = g = b = a = 0;
         return new Color({r, g, b, a});
       } else {
-        return Color.fromArray([randomByte(), randomByte(), randomByte()]);
+        return null;
       }
     } else if (typeof input === 'object') {
       if (input.a !== undefined) {
@@ -270,7 +270,13 @@ export class Color {
     return Color.fromArray(arr);
   }
   static fromRgbString(s) {
-    return Color.fromArray(s.split('(')[1].split(')')[0].split(','));
+    if (s.includes(',')) {
+      return Color.fromArray(s.split('(')[1].split(')')[0].split(','));
+    }
+    const vals = s.replace('/',' ').split('(')[1].replace(')','')
+      .split(' ').filter(v=>isFinite(Number(v)));
+
+    return Color.fromArray(vals);
   }
   static fromHsv({h, s, v}) {
     s = s / 100;
@@ -591,4 +597,3 @@ export class Color {
     return Color.fromArray(rgb);
   }
 }
-

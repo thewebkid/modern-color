@@ -1,4 +1,4 @@
-# modern-color Color Parsing/Manipulation  [![npm version](https://badge.fury.io/js/modern-color.svg)](https://badge.fury.io/js/modern-color) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# modern-color - Color Parsing/Manipulation  [![npm version](https://badge.fury.io/js/modern-color.svg)](https://badge.fury.io/js/modern-color) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A color lib (class) that simplifies color parsing and conversion as well as most common color functions. To visually see the channels (rgb / hsl / hsv / alpha) of a color, see [this demo](https://thewebkid.com/modules/v-cpicker).
 
@@ -12,21 +12,21 @@ A color lib (class) that simplifies color parsing and conversion as well as most
 
 ## Parsing examples (constructors)
 
-| Constructor    | Example    | Comments                                                |
-|:---------------|:-----------|:--------------------------------------------------------|
-| [named color](https://www.w3schools.com/colors/colors_names.asp) | `Color.parse('salmon', [alpha])`  | Any known [HTML color name](https://www.w3schools.com/colors/colors_names.asp). <br>This package exports a namedColors object you can also utilize. |
-| hex | `Color.parse('#FA8072', [alpha])` | Will parse #RGB, #RRGGBB, and even #RRGGBBAA hexadecimal color formats.|
-| rgb (string) | `Color.parse('rgba(250, 128, 114, 0.65)')` | Standard CSS RGB format (either rgb or rgba) |
-| rgb (arguments) | `Color.parse(250, 128, 114, 0.65)` | Pass 3 or 4 (for alpha) numeric params as r, g, b, a |
-| rgb (object) | `Color.parse({r:250, g:128, b:114, a:0.65})` | Pass a single object param containing r, g, b, <br>and optionally a (alpha) values |
-| hsl (object) | `Color.parse({h:6, s:93, l:71, a:0.65})` | Pass a single object param containing h, s, l <br>(hue, saturation, luminosity) and optionally a (alpha) property values.  |
-| hsv (object) | `Color.parse({h:6, s:54, v:98, a:0.65})` | Pass a single object param containing h, s, v <br>(hue, saturation, value) and optionally a (alpha) property values.  |
-| cmyk (object) | `Color.parse({c:0, m:49, y:54, k:2, a:0.65})` | Pass a single object param containing c, m, y, k <br>(cyan, magenta, yellow, black) and optionally a (alpha) property values.  |
-| rgb (array) | `Color.parse([250, 128, 114, 0.65])` | Pass rgb values as a 3 or 4 (if using alpha) member array [r, g, b [, a]].  |
+| Constructor    | Example                                                                                   | Comments                                                |
+|:---------------|:------------------------------------------------------------------------------------------|:--------------------------------------------------------|
+| [named color](https://www.w3schools.com/colors/colors_names.asp) | `Color.parse('salmon', [alpha])`                                                          | Any known [HTML color name](https://www.w3schools.com/colors/colors_names.asp). <br>This package exports a namedColors object you can also utilize. |
+| hex | `Color.parse('#FA8072', [alpha])`                                                         | Will parse #RGB, #RRGGBB, and even #RRGGBBAA hexadecimal color formats.|
+| rgb (string) | `Color.parse('rgba(250, 128, 114, 0.65)')` or `Color.parse('rgba(250 128 114 / 0.65)')` | Standard CSS RGB format (either rgb or rgba) |
+| rgb (arguments) | `Color.parse(250, 128, 114, 0.65)`                                                        | Pass 3 or 4 (for alpha) numeric params as r, g, b, a |
+| rgb (object) | `Color.parse({r:250, g:128, b:114, a:0.65})`                                              | Pass a single object param containing r, g, b, <br>and optionally a (alpha) values |
+| hsl (object) | `Color.parse({h:6, s:93, l:71, a:0.65})`                                                  | Pass a single object param containing h, s, l <br>(hue, saturation, luminosity) and optionally a (alpha) property values.  |
+| hsv (object) | `Color.parse({h:6, s:54, v:98, a:0.65})`                                                  | Pass a single object param containing h, s, v <br>(hue, saturation, value) and optionally a (alpha) property values.  |
+| cmyk (object) | `Color.parse({c:0, m:49, y:54, k:2, a:0.65})`                                             | Pass a single object param containing c, m, y, k <br>(cyan, magenta, yellow, black) and optionally a (alpha) property values.  |
+| rgb (array) | `Color.parse([250, 128, 114, 0.65])`                                                      | Pass rgb values as a 3 or 4 (if using alpha) member array [r, g, b [, a]].  |
 
 The above examples return color class instances with identical r, g, and b values - they only differ in how they were constructed.
 
-You can use new Color(constructor) or Color.parse(constructor). The alpha channel is optional in all formats (defaults to 1). This document assumes you are familiar with color min / max values per channel. [Read more about colors](https://www.w3schools.com/css/css3_colors.asp).
+You can use new Color(constructor) or Color.parse(constructor). The alpha channel is optional in all formats (defaults to 1). This document assumes you are familiar with color min / max values per channel. [Read more about colors](https://www.w3schools.com/css/css3_colors.asp). Invalid input returns null.
 
 CYMK is supported in this module, but is not supported by any browsers currently. Thanks to [renevanderlende](https://github.com/renevanderlende) for implementing this contribution.
 

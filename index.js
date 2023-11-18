@@ -245,6 +245,7 @@ export class Color {
     return Color.fromHex(namedColors[colorName.toLowerCase()], a);
   }
   static fromArray(input) {
+    input = input.filter(channel=>channel !== '' && isFinite(channel)).map(toFlt);
     const c = {
       r: colorByte(input[0]),
       g: colorByte(input[1]),
@@ -274,7 +275,7 @@ export class Color {
       return Color.fromArray(s.split('(')[1].split(')')[0].split(','));
     }
     const vals = s.replace('/',' ').split('(')[1].replace(')','')
-      .split(' ').filter(v=>isFinite(Number(v)));
+      .split(' ').filter(v => v !== '' && isFinite(Number(v)));
 
     return Color.fromArray(vals);
   }

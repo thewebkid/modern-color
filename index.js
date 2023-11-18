@@ -245,7 +245,7 @@ export class Color {
     return Color.fromHex(namedColors[colorName.toLowerCase()], a);
   }
   static fromArray(input) {
-    input = input.filter(channel=>channel !== '' && isFinite(channel)).map(toFlt);
+    input = input.filter(channel=>channel !== '' && isFinite(channel));
     const c = {
       r: colorByte(input[0]),
       g: colorByte(input[1]),

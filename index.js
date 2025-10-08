@@ -1,8 +1,17 @@
-const colorByte = v => maxVal(255, Math.round(Number(v)));
-const float2Byte = v => colorByte(v * 255);
 const byte2Float = v => maxVal(1, v / 255);
 const maxVal = (max, v) => Math.max(0, Math.min(max, v));
+// sRGB (0-1) to linear RGB (0-1)
+const srgbToLinear = (c) => c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
 
+// Linear RGB (0-1) to sRGB (0-1)
+const linearToSrgb = (c) => c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+
+// Matrix multiplication helper: vec = [r,g,b], mat = 3x3 array
+const matMul = (mat, vec) => [
+  mat[0][0] * vec[0] + mat[0][1] * vec[1] + mat[0][2] * vec[2],
+  mat[1][0] * vec[0] + mat[1][1] * vec[1] + mat[1][2] * vec[2],
+  mat[2][0] * vec[0] + mat[2][1] * vec[1] + mat[2][2] * vec[2]
+];
 const toFlt = (v) => {
   if (v === undefined) {
     return 1;
@@ -167,7 +176,6 @@ export const namedColors = {
   'yellow': '#FFFF00',
   'yellowgreen': '#9ACD32'
 };
-
 export class Color {
   constructor(input, g, b, a) {
     if (Color.isBaseConstructor(input)) {
@@ -209,7 +217,7 @@ export class Color {
       } else if (input.startsWith('rgb')) {
         return Color.fromRgbString(input);
       } else if(input === 'transparent'){
-        let r,g,b,a;
+        let r, g, b, a;
         r = g = b = a = 0;
         return new Color({r, g, b, a});
       } else {
@@ -221,12 +229,15 @@ export class Color {
       }
       if (input.h !== undefined) {
         let c = {};
+        if (input.l !== undefined && input.c !== undefined) {
+          return Color.fromOklch(input);
+        }
         if (input.v !== undefined) {
           c = Color.fromHsv(input);
         } else if (input.l !== undefined) {
           c = Color.fromHsl(input);
         } else {
-          return Color.fromArray([0, 0, 0]);
+          return null;
         }
         c.a = input.a !== undefined ? toFlt(input.a) : undefined;
         return new Color(c);
@@ -245,7 +256,7 @@ export class Color {
     return Color.fromHex(namedColors[colorName.toLowerCase()], a);
   }
   static fromArray(input) {
-    input = input.filter(channel=>channel !== '' && isFinite(channel));
+    input = input.filter(channel => channel !== '' && isFinite(channel));
     const c = {
       r: colorByte(input[0]),
       g: colorByte(input[1]),
@@ -274,7 +285,7 @@ export class Color {
     if (s.includes(',')) {
       return Color.fromArray(s.split('(')[1].split(')')[0].split(','));
     }
-    const vals = s.replace('/',' ').split('(')[1].replace(')','')
+    const vals = s.replace('/', ' ').split('(')[1].replace(')', '')
       .split(' ').filter(v => v !== '' && isFinite(Number(v)));
 
     return Color.fromArray(vals);
@@ -342,8 +353,40 @@ export class Color {
     const chanCalc = ch => float2Byte(
       1 - Math.min(1, (ch / 100) * (1 - k) + k)
     );
-    return new Color({r:chanCalc(c), b:chanCalc(m), g:chanCalc(y), a});
+    return new Color({r: chanCalc(c), b: chanCalc(m), g: chanCalc(y), a});
   }
+  static fromOklch({l, c, h, a}) {
+    // Normalize inputs (l:0-1, c:0+, h:0-360)
+    l = maxVal(1, Number(l));
+    c = Math.max(0, Number(c));
+    h = Number(h) % 360;
+    const rad = h * Math.PI / 180;
+
+    // OKLCH to OKLab
+    const a_lab = c * Math.cos(rad);
+    const b_lab = c * Math.sin(rad);
+
+    // OKLab to LMS' (cube root space)
+    const l_ = l + 0.3963377774 * a_lab + 0.2158037573 * b_lab;
+    const m_ = l - 0.1055613458 * a_lab - 0.0638541728 * b_lab;
+    const s_ = l - 0.0894841775 * a_lab - 1.2914855480 * b_lab;
+
+    // Cube to LMS
+    const LMS = [l_ ** 3, m_ ** 3, s_ ** 3];
+
+    // LMS to linear RGB (0-1) via inverse matrix
+    const linRGB = matMul([
+      [4.0767416621, -3.3077115913, 0.2309699292],
+      [-1.2684380046, 2.6097574011, -0.3413193965],
+      [-0.0041960863, -0.7034186147, 1.7076147010]
+    ], LMS);
+
+    // Linear to sRGB (0-1), then to bytes
+    const rgb = linRGB.map(v => colorByte(255 * linearToSrgb(Math.max(0, v)))); // Clip to gamut
+
+    return new Color({r: rgb[0], g: rgb[1], b: rgb[2], a: toFlt(a)});
+  }
+
 
   /** Getters **/
   get alpha(){
@@ -358,7 +401,7 @@ export class Color {
   }
   get rgbObj() {
     let {r, g, b} = this;
-    return {r, g, b, a:this.alpha};
+    return {r, g, b, a: this.alpha};
   }
   get css(){
     return this.rgbString;
@@ -453,7 +496,6 @@ export class Color {
       a: this.alpha
     };
   }
-
   get cmyk(){
     let c, m, y, k;
 
@@ -477,7 +519,46 @@ export class Color {
 
     return this.alpha ? { c, m, y, k, a: this.alpha } : { c, m, y, k };
   }
+  get oklch() { // Helper: {r,g,b} bytes to {l,c,h,a}
+    const {r, g, b, a} = this;
+    // Bytes to sRGB (0-1)
+    const srgb = [r / 255, g / 255, b / 255];
 
+    // sRGB to linear RGB (0-1)
+    const linRGB = srgb.map(srgbToLinear);
+
+    // Linear RGB to LMS via matrix
+    const LMS = matMul([
+      [0.4122214708, 0.5363325363, 0.0514459929],
+      [0.2119034982, 0.6806995451, 0.1073969566],
+      [0.0883024619, 0.2817188376, 0.6299787005]
+    ], linRGB);
+
+    // Cube root to LMS'
+    const LMS_ = LMS.map(Math.cbrt);
+
+    // LMS' to OKLab via matrix
+    const [L, a_lab, b_lab] = matMul([
+      [0.2104542553, 0.7936177850, -0.0040720468],
+      [1.9779984951, -2.4285922050, 0.4505937099],
+      [0.0259040371, 0.7827717662, -0.8086757660]
+    ], LMS_);
+
+    // OKLab to OKLCH
+    const C = Math.sqrt(a_lab ** 2 + b_lab ** 2);
+    let H = Math.atan2(b_lab, a_lab) * 180 / Math.PI;
+    if (H < 0) H += 360;
+
+    return {l: L, c: C, h: H, a};
+  }
+  get oklchString() {
+    const {l, c, h} = this.oklch;
+    return `oklch(${l} ${c} ${h})`;
+  }
+  get oklchaString() {
+    const {l, c, h, a} = this.oklch;
+    return `oklch(${l} ${c} ${h} / ${a})`;
+  }
   get hslString() {
     const hsl = this.hsl;
     return `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
@@ -486,7 +567,10 @@ export class Color {
     const hsl = this.hsl;
     return `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, ${hsl.a})`;
   }
-
+  get hsvString(){
+    const { h,s,v } = this.hsv;
+    return `hsv(${h}, ${s}%, ${v}%)`;
+  }
   get cmykString() {
     const cmyk = this.cmyk;
     return `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`;
@@ -495,43 +579,30 @@ export class Color {
     const cmyk = this.cmyk;
     return `cmyka(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%, ${cmyk.a})`;
   }
-
+  get isGrayScale(){
+    return this.r === this.g && this.g === this.b;
+  }
   /** Functions **/
   toString(format = 'rgb') {// accepts rgb, rgbaHex, hex, hsl, hsla, cmyk, cmyka
-    let s;
-    switch (format) {
-      case 'rgb':
-        s = this.rgbString;
-        break;
-      case 'hex':
-        s = this.hex;
-        break;
-      case 'rgbaHex':
-        s = this.hexa;
-        break;
-      case 'hsl':
-        s = this.hslString;
-        break;
-      case 'hsla':
-        s = this.hslaString;
-        break;
-      case 'cmyk':
-        s = this.cmykString;
-        break;
-      case 'cmyka':
-        s = this.cmykaString;
-        break;
 
-      default :
-        s = this.rgbString;
-        break;
+    switch (format) {
+      case 'rgb': return this.rgbString;
+      case 'hex': return this.hex;
+      case 'rgbaHex': return this.hexa;
+      case 'hsl': return this.hslString;
+      case 'hsla': return this.hslaString;
+      case 'hsv': return this.hsvString;
+      case 'cmyk': return this.cmykString;
+      case 'cmyka': return this.cmykaString;
+      case 'oklch': return this.oklchString;
+      case 'oklcha': return this.oklchaString;
+      default:return this.rgbString;
     }
-    return s;
   }
   mix(color, ratio = 0.5) {
     const rgb1 = this.rgba;
     rgb1[3] = float2Byte(rgb1[3]);
-    const rgb2 = new Color(color).rgba;
+    const rgb2 = Color.parse(color).rgba;
     rgb2[3] = float2Byte(rgb2[3]);
     ratio = toFlt(ratio);
     const mixed = rgb1.map((lc, i) => {
@@ -554,7 +625,7 @@ export class Color {
     let incrementBy =  (reverse ? val : 100 - val) * ratio;
     hsl[chan] = maxVal(100, reverse ? val - incrementBy : val + incrementBy);
     hsl.a = this.a;
-    return new Color(hsl);
+    return Color.parse(hsl);
   }
   lighten(ratio, reverse = false) {
     return this.adjustSatLum('l', ratio, reverse);
@@ -563,10 +634,17 @@ export class Color {
     return this.lighten(ratio, true);
   }
   saturate(ratio, reverse = false) {
+    if (ratio === 0) return this;
+    if (ratio < 0) {
+      reverse = true;
+      ratio = - ratio;
+    }
     return this.adjustSatLum('s', ratio, reverse);
   }
   desaturate(ratio) {
-    return this.saturate(ratio, true);
+    const {h,l} = this.hsl;
+    if (ratio >= 1) return Color.fromHsl({h, l, s: 0});
+    return Color.fromHsl({h, l, s: maxVal(100, l * (1 - ratio))});
   }
   grayscale() {
     return this.desaturate(1);
@@ -578,14 +656,14 @@ export class Color {
     const hsl = this.hsl;
     hsl.h = Math.round(hsl.h + deg) % 360;
     hsl.a = this.a;
-    return new Color(hsl);
+    return Color.parse(hsl);
   }
   fadeIn(ratio, reverse) {
     let a = this.alpha;
     const {r, g, b} = this;
     let incr = (1 - a) * ratio;
     a = reverse ? a - incr : a + incr;
-    return Color({r, g, b, a});
+    return Color.parse({r, g, b, a});
   }
   fadeOut(ratio) {
     return this.fadeIn(ratio, true);
@@ -596,5 +674,56 @@ export class Color {
       rgb.push(this.alpha);
     }
     return Color.fromArray(rgb);
+  }
+  toAlpha(alpha){
+    return Color.parse({...this.rgbObj, a: alpha});
+  }
+  toHSVSaturation(saturation){
+    return Color.parse({...this.hsv, s: saturation});
+  }
+  toHSLSaturation(saturation){
+    return Color.parse({...this.hsl, s: saturation});
+  }
+  toLuminance(luminance){
+    return Color.parse({...this.hsl, l: luminance});
+  }
+  toHue(hue){
+    return Color.fromHsl({...this.hsl, h: hue % 360});
+  }
+  toValue(value){
+    return Color.parse({...this.hsv, v: value});
+  }
+  toOklchLightness(lightness) {
+    const oklch = this.oklch;
+    oklch.l = maxVal(1, Number(lightness));
+    return Color.fromOklch(oklch);
+  }
+  toChroma(chroma) {
+    const oklch = this.oklch;
+    oklch.c = Math.max(0, Number(chroma));
+    return Color.fromOklch(oklch);
+  }
+  getShades(n = 10, space = 'hsl', startLight = 0.95, endLight = 0.05) {
+    if (n < 2) return [this]; // Minimum sensible shades
+    const shades = [];
+    const step = (startLight - endLight) / (n - 1);
+
+    if (space === 'hsl') {
+      // HSL mode: Fix original h and s, vary l
+      const {h, s} = this.hsl;
+      for (let i = 0; i < n; i++) {
+        const l = (startLight * 100) - i * step * 100; // Scale to %
+        shades.push(Color.fromHsl({h, s, l}));
+      }
+    } else {
+      // OKLCH mode: Fix h and c, vary l (perceptual)
+      const {h, c, a} = this.oklch;
+      for (let i = 0; i < n; i++) {
+        const l = startLight - i * step;
+        shades.push(Color.fromOklch({l, c, h, a}));
+      }
+    }
+
+    return shades;
   }
 }

@@ -26,10 +26,11 @@ This library _modernizes_ older color libs that exist with nicer syntax - making
 | hsv (object) | `Color.parse({h:6, s:54, v:98, a:0.65})`                                                  | Pass a single object param containing h, s, v <br>(hue, saturation, value) and optionally a (alpha) property values.  |
 | cmyk (object) | `Color.parse({c:0, m:49, y:54, k:2, a:0.65})`                                             | Pass a single object param containing c, m, y, k <br>(cyan, magenta, yellow, black) and optionally a (alpha) property values.  |
 | rgb (array) | `Color.parse([250, 128, 114, 0.65])`                                                      | Pass rgb values as a 3 or 4 (if using alpha) member array [r, g, b [, a]].  |
+| oklch (object) | `Color.parse({l:0.7, c:0.1, h:40, a:0.8})`                                                | Pass a single object param containing l (0-1), c (0+), h (0-360), and optionally a (alpha 0-1).  |
 
 The above examples return color class instances with identical r, g, and b values - they only differ in how they were constructed.
 
-You can use new Color(constructor) or Color.parse(constructor). The alpha channel is optional in all formats (defaults to 1). This document assumes you are familiar with color min / max values per channel. [Read more about colors](https://www.w3schools.com/css/css3_colors.asp). Invalid input returns null.
+You can use new Color(constructor) or Color.parse(constructor). The alpha channel is optional in all formats (defaults to 1). This document assumes you are familiar with color min / max values per channel. [Read more about colors](https://www.w3schools.com/css/css3_colors.asp). Invalid input returns null. 'transparent' is also supported and parses to rgba(0,0,0,0).
 
 CYMK is supported in this module, but is not supported by any browsers currently. Thanks to [renevanderlende](https://github.com/renevanderlende) for implementing this contribution.
 
@@ -56,7 +57,7 @@ The example values are based on the same base color instance as above: `Color.pa
 
 | Getter               | Value Type | Example                                                 |
 |:---------------------|:-----------|:--------------------------------------------------------|
-| **rgb**              | _Array_    | `[250, 128, 114, 0.65]`                                 |
+| **rgb**              | _Array_    | `[250, 128, 114]`                                       |
 | **rgba**             | _Array_    | `[250, 128, 114, 0.65]`                                 |
 | **rgbObj**           | _Object_   | `{r:250, g:128, b:114, a:0.65}`                         |
 | **hsl**              | _Object_   | `{h:6, s:93, l:71}`                                     |
@@ -65,20 +66,43 @@ The example values are based on the same base color instance as above: `Color.pa
 | **hsva**             | _Object_   | `{h:6, s:54, v:98, a:0.65}`                             |
 | **cmyk**             | _Object_   | `{c:0, m:49, y:54, k:2}`                                |
 | **cmyka**            | _Object_   | `{c:0, m:49, y:54, k:2, a:0.65}`                        |
+| **oklch**            | _Object_   | `{l:0.78, c:0.13, h:20, a:0.65}`                        |
+| **hslString**        | _String_   | `hsl(6, 93%, 71%)`                                      |
+| **hslaString**       | _String_   | `hsla(6, 93%, 71%, 0.65)`                               |
+| **hsvString**        | _String_   | `hsv(6, 54%, 98%)`                                      |
+| **cmykString**       | _String_   | `cmyk(0%, 49%, 54%, 2%)`                                |
+| **cmykaString**      | _String_   | `cmyka(0%, 49%, 54%, 2%, 0.65)`                         |
+| **oklchString**      | _String_   | `oklch(0.78 0.13 20)`                                   |
+| **oklchaString**     | _String_   | `oklch(0.78 0.13 20 / 0.65)`                            |
 | **css**              | _String_   | `rgba(250, 128, 114, 0.65)` or `rgb(250, 128, 114)`     |
 | **rgbString**        | _String_   | `rgba(250, 128, 114, 0.65)` or `rgb(250, 128, 114)`     |
 | **rgbaString**       | _String_   | `rgba(250, 128, 114, 0.65)` or `rgba(250, 128, 114, 1)` |
 | **hex**              | _String_   | `#FA8072`                                               |
 | **hexa**/**rgbaHex** | _String_   | `#FA8072A6`                                             |
-| **alpha**            | _String_   | `0.65` or defaults to `1` if no alpha channel           |
+| **alpha**            | _Number_   | `0.65` or defaults to `1` if no alpha channel           |
+| **isGrayScale**      | _Boolean_  | `false`                                                 |
 
+Note: `css` is an alias for `rgbString`. OKLCH values: l (lightness 0-1), c (chroma 0+), h (hue 0-360).
 
 ### toString(_format_)
-Accepts a format string ('rgb', 'hex', 'rgbaHex', 'hsl', 'hsla', 'cmyk', 'cmyka') which will return the equivalent of calling the corresponding getter. Defaults to rgb.
+Accepts a format string ('rgb', 'hex', 'rgbaHex', 'hsl', 'hsla', 'hsv', 'cmyk', 'cmyka', 'oklch', 'oklcha') which will return the equivalent of calling the corresponding getter. Defaults to rgb.
 ```javascript
 console.log(color.toString(format));
-
 ```
+
+#### Magic in Templates: Direct Color Usage
+One of the coolest features of `modern-color` is that Color instances can be dropped directly into string templates or JSX— no need to manually call getters! The JavaScript engine automatically invokes `toString()` to convert them to CSS-friendly 'rgb' strings. This makes your code cleaner and more intuitive.
+
+Example:
+```javascript
+const blue = Color.parse('blue');
+const desaturatedBlue = blue.desaturate(0.5); // Chain methods for instant variations!
+
+const template = `<div style="background-color: ${desaturatedBlue}; border: solid 1px ${blue}">Content</div>`;
+// Renders as: <div style="background-color: rgba(64, 128, 255, 1); border: solid 1px rgba(0, 0, 255, 1)">Content</div>
+```
+
+This seamless integration works perfectly in modern frameworks like React, Vue, or Angular—try it and watch your color workflows become effortless and fun!
 
 ## Color functions
 These functions return new color instances and do not modify the original color. The ratio param must be a float (min:0, max:1).
@@ -135,3 +159,14 @@ color.negate(); //{r:0, g:128, b:200}->{r:255, g:127, b:55}
 ```
 
 Obviously many well-known public algorithms and functions are involved here. Hope you enjoy!
+
+## Utility methods
+These methods return new Color instances by modifying specific channels:
+
+- `toAlpha(alpha)`: Sets alpha (0-1), e.g. `color.toAlpha(0.5)`
+- `toHSVSaturation(saturation)`: Sets HSV saturation (0-100), e.g. `color.toHSVSaturation(80)`
+- `toHSLSaturation(saturation)`: Sets HSL saturation (0-100), e.g. `color.toHSLSaturation(80)`
+- `toLuminance(luminance)`: Sets HSL luminance (0-100), e.g. `color.toLuminance(50)`
+- `toHue(hue)`: Sets hue (0-360), e.g. `color.toHue(180)`
+- `toValue(value)`: Sets HSV value (0-100), e.g. `color.toValue(90)`
+- `

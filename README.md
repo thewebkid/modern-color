@@ -91,7 +91,7 @@ console.log(color.toString(format));
 ```
 
 #### Magic in Templates: Direct Color Usage
-One of the coolest features of `modern-color` is that Color instances can be dropped directly into string templates or JSX— no need to manually call getters! The JavaScript engine automatically invokes `toString()` to convert them to CSS-friendly 'rgb' strings. This makes your code cleaner and more intuitive.
+One of the coolest features of `modern-color` is that Color instances can be dropped directly into string templates or JSX— no need to manually call getters! The JavaScript engine automatically invokes `toString()` to convert them to CSS-friendly 'rgb' or 'rgba' strings. This makes your code cleaner and more intuitive.
 
 Example:
 ```javascript

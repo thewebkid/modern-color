@@ -1,6 +1,6 @@
 {
   "name": "modern-color",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": "Ron Gilchrist (thewebkid)",
   "description": "An ES Next color class that simplifies color parsing and conversion. Implements most common color functions.",
   "keywords": [
@@ -9,6 +9,7 @@
     "hsl",
     "hsv",
     "cmyk",
+    "oklch",
     "esnext",
     "color"
   ],

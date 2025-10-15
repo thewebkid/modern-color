@@ -1,3 +1,5 @@
+const colorByte = v => maxVal(255, Math.round(Number(v)));
+const float2Byte = v => colorByte(v * 255);
 const byte2Float = v => maxVal(1, v / 255);
 const maxVal = (max, v) => Math.max(0, Math.min(max, v));
 // sRGB (0-1) to linear RGB (0-1)

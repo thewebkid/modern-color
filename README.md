@@ -1,7 +1,7 @@
 # modern-color - Color Parsing/Conversion/Manipulation
 [![npm version](https://badge.fury.io/js/modern-color.svg)](https://badge.fury.io/js/modern-color) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An ES2020 color lib (class) that simplifies color parsing and conversion as well as most common color functions. To visually see the channels (rgb / hsl / hsv / alpha) of a color, see [this demo](https://thewebkid.com/modules/lit-colorpicker).
+An ESNext color lib (class) that simplifies color parsing and conversion as well as most common color functions. To visually see the channels (rgb / hsl / hsv / alpha) of a color, see [this demo](https://thewebkid.com/modules/lit-colorpicker).
 
 This library _modernizes_ older color libs that exist with nicer syntax - making it easier to work with colors!
 
@@ -169,4 +169,6 @@ These methods return new Color instances by modifying specific channels:
 - `toLuminance(luminance)`: Sets HSL luminance (0-100), e.g. `color.toLuminance(50)`
 - `toHue(hue)`: Sets hue (0-360), e.g. `color.toHue(180)`
 - `toValue(value)`: Sets HSV value (0-100), e.g. `color.toValue(90)`
-- `
+- `toOklchLightness(lightness)`: Sets OKLCH lightness (0-1), e.g. `color.toOklchLightness(0.7)`
+- `toChroma(chroma)`: Sets OKLCH chroma (0+), e.g. `color.toChroma(0.1)`
+- `getShades(n = 10, space = 'hsl', startLight = 0.95, endLight = 0.05)`: Generates an array of n shades of the color by varying lightness from startLight to endLight in the specified space ('hsl' or 'oklch'), e.g. `color.getShades(5, 'oklch')`

@@ -1,6 +1,21 @@
 # modern-color - Color Parsing/Conversion/Manipulation
 [![npm version](https://badge.fury.io/js/modern-color.svg)](https://badge.fury.io/js/modern-color) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## Features
+✨ Zero dependencies • 🎨 Multiple color spaces (RGB, HSL, HSV, CMYK, OKLCH) • 🔧 Immutable transformations • 📦 Tree-shakeable • 🎯 TypeScript support • 🌐 140+ named colors
+
+## Quick Start
+```javascript
+import {Color} from 'modern-color';
+
+const salmon = Color.parse('salmon');
+const lighter = salmon.lighten(0.2);
+const rotated = salmon.hue(180);
+
+// Use directly in templates
+document.body.style.background = lighter; // Auto-converts to CSS
+```
+
 An ESNext color lib (class) that simplifies color parsing and conversion as well as most common color functions. To visually see the channels (rgb / hsl / hsv / alpha) of a color, see [this demo](https://thewebkid.com/modules/lit-colorpicker).
 
 This library _modernizes_ older color libs that exist with nicer syntax - making it easier to work with colors!
@@ -10,8 +25,19 @@ This library _modernizes_ older color libs that exist with nicer syntax - making
 ## Installation
     npm i --save modern-color
 
+> **Note:** This is an ES module. Use with modern bundlers (Vite, Webpack 5+, Rollup) or `<script type="module">` in browsers.
+
 ### Initialize
     import {Color} from "modern-color";
+
+### TypeScript
+Full TypeScript definitions included:
+```typescript
+import {Color, type RGB, type HSL, type OKLCH} from 'modern-color';
+
+const color: Color = Color.parse('#FF0000');
+const hsl: HSL = color.hsl;
+```
 
 ## Parsing examples (constructors)
 
@@ -32,7 +58,7 @@ The above examples return color class instances with identical r, g, and b value
 
 You can use new Color(constructor) or Color.parse(constructor). The alpha channel is optional in all formats (defaults to 1). This document assumes you are familiar with color min / max values per channel. [Read more about colors](https://www.w3schools.com/css/css3_colors.asp). Invalid input returns null. 'transparent' is also supported and parses to rgba(0,0,0,0).
 
-CYMK is supported in this module, but is not supported by any browsers currently. Thanks to [renevanderlende](https://github.com/renevanderlende) for implementing this contribution.
+CMYK is supported in this module, but is not supported by any browsers currently. Thanks to [renevanderlende](https://github.com/renevanderlende) for implementing this contribution.
 
 ### Note - Normalized colors
 No matter how the color is constructed, it is normalized to always contain r, g, and b values. For example:

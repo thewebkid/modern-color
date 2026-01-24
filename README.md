@@ -1,6 +1,10 @@
 # modern-color - Color Parsing/Conversion/Manipulation
 [![npm version](https://badge.fury.io/js/modern-color.svg)](https://badge.fury.io/js/modern-color) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+An ESNext color lib (class) that simplifies color parsing and conversion as well as most common color functions. To visually see the channels (rgb / hsl / hsv / alpha) of a color, see [this demo](https://thewebkid.com/modules/lit-colorpicker).
+
+This library _modernizes_ older color libs that exist with nicer syntax - making it easier to work with colors!
+
 ## Features
 ✨ Zero dependencies • 🎨 Multiple color spaces (RGB, HSL, HSV, CMYK, OKLCH) • 🔧 Immutable transformations • 📦 Tree-shakeable • 🎯 TypeScript support • 🌐 140+ named colors
 
@@ -15,10 +19,6 @@ const rotated = salmon.hue(180);
 // Use directly in templates
 document.body.style.background = lighter; // Auto-converts to CSS
 ```
-
-An ESNext color lib (class) that simplifies color parsing and conversion as well as most common color functions. To visually see the channels (rgb / hsl / hsv / alpha) of a color, see [this demo](https://thewebkid.com/modules/lit-colorpicker).
-
-This library _modernizes_ older color libs that exist with nicer syntax - making it easier to work with colors!
 
 [Raw Gist](https://gist.github.com/thewebkid/e3a1c969564256aeaf6f5137d03fa401)
 

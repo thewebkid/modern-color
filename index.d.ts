@@ -34,7 +34,21 @@ export interface OKLCH {
   a?: number;
 }
 
-export type ColorInput = string | RGB | HSL | HSV | CMYK | OKLCH | [number, number, number, number?];
+export interface HWB {
+  h: number;
+  w: number;
+  b: number;
+  a?: number;
+}
+
+export type ColorSpace = 'rgb' | 'hsl' | 'oklch';
+export type ToStringFormat = 'rgb' | 'hex' | 'rgbaHex' | 'hsl' | 'hsla' | 'hsv' | 'cmyk' | 'cmyka' | 'oklch' | 'oklcha' | 'hwb' | 'hwba';
+export type ReadabilityLevel = 'AA' | 'AAA';
+export type ReadabilitySize = 'normal' | 'large';
+export interface ReadabilityOptions { level?: ReadabilityLevel; size?: ReadabilitySize; }
+export interface ToStringOptions { modern?: boolean; }
+
+export type ColorInput = string | RGB | HSL | HSV | CMYK | OKLCH | HWB | [number, number, number, number?];
 
 export const namedColors: Record<string, string>;
 
@@ -52,6 +66,7 @@ export class Color {
   static parse(hsv: HSV): Color;
   static parse(cmyk: CMYK): Color;
   static parse(oklch: OKLCH): Color;
+  static parse(hwb: HWB): Color;
   static parse(colorName: string, alpha?: number): Color | null;
   static parse(rgba: [number, number, number, number?]): Color;
   static parse(r: number, g: number, b: number, a?: number): Color;
@@ -65,6 +80,8 @@ export class Color {
   static fromHsl(hsl: HSL): Color;
   static fromCMYK(cmyk: CMYK): Color;
   static fromOklch(oklch: OKLCH): Color;
+  static fromHwb(hwb: HWB): Color;
+  static nearestNamed(input: ColorInput | Color): string;
 
   readonly alpha: number;
   readonly rgb: [number, number, number];
@@ -77,6 +94,7 @@ export class Color {
   readonly cmyk: CMYK;
   readonly cmyka: CMYK;
   readonly oklch: OKLCH;
+  readonly hwb: HWB;
   readonly hex: string;
   readonly hexa: string;
   readonly rgbaHex: string;
@@ -90,14 +108,17 @@ export class Color {
   readonly cmykaString: string;
   readonly oklchString: string;
   readonly oklchaString: string;
+  readonly hwbString: string;
+  readonly hwbaString: string;
   readonly isGrayScale: boolean;
+  readonly relativeLuminance: number;
 
-  toString(format?: 'rgb' | 'hex' | 'rgbaHex' | 'hsl' | 'hsla' | 'hsv' | 'cmyk' | 'cmyka' | 'oklch' | 'oklcha'): string;
-  mix(color: ColorInput, ratio?: number): Color;
-  lighten(ratio: number): Color;
-  darken(ratio: number): Color;
-  saturate(ratio: number): Color;
-  desaturate(ratio: number): Color;
+  toString(format?: ToStringFormat, options?: ToStringOptions): string;
+  mix(color: ColorInput, ratio?: number, space?: ColorSpace): Color;
+  lighten(ratio: number, space?: ColorSpace): Color;
+  darken(ratio: number, space?: ColorSpace): Color;
+  saturate(ratio: number, reverse?: boolean, space?: ColorSpace): Color;
+  desaturate(ratio: number, space?: ColorSpace): Color;
   grayscale(): Color;
   rotate(deg: number): Color;
   hue(deg: number): Color;
@@ -113,4 +134,12 @@ export class Color {
   toOklchLightness(lightness: number): Color;
   toChroma(chroma: number): Color;
   getShades(n?: number, space?: 'hsl' | 'oklch', startLight?: number, endLight?: number): Color[];
+  contrast(color2: ColorInput): number;
+  isReadable(color2: ColorInput, options?: ReadabilityOptions): boolean;
+  equals(color2: ColorInput): boolean;
+  complementary(): Color[];
+  analogous(angle?: number): Color[];
+  triadic(): Color[];
+  tetradic(angle?: number): Color[];
+  nearestNamed(): string;
 }

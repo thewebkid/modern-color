@@ -8,6 +8,28 @@ const srgbToLinear = (c) => c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.
 // Linear RGB (0-1) to sRGB (0-1)
 const linearToSrgb = (c) => c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
 
+// Pure-hue RGB triplet (0-1) for HWB conversions
+const hueToRgb = (h) => {
+  h = ((h % 360) + 360) % 360;
+  const x = 1 - Math.abs((h / 60) % 2 - 1);
+  if (h < 60) return [1, x, 0];
+  if (h < 120) return [x, 1, 0];
+  if (h < 180) return [0, 1, x];
+  if (h < 240) return [0, x, 1];
+  if (h < 300) return [x, 0, 1];
+  return [1, 0, x];
+};
+
+// Shortest-path hue interpolation
+const mixHue = (h1, h2, t) => {
+  let dh = h2 - h1;
+  if (dh > 180) dh -= 360;
+  else if (dh < -180) dh += 360;
+  return (h1 + dh * t + 360) % 360;
+};
+
+const round3 = v => Math.round(v * 1000) / 1000;
+
 // Matrix multiplication helper: vec = [r,g,b], mat = 3x3 array
 const matMul = (mat, vec) => [
   mat[0][0] * vec[0] + mat[0][1] * vec[1] + mat[0][2] * vec[2],
@@ -230,19 +252,19 @@ export class Color {
         this.a = toFlt(input.a);
       }
       if (input.h !== undefined) {
-        let c = {};
         if (input.l !== undefined && input.c !== undefined) {
           return Color.fromOklch(input);
         }
         if (input.v !== undefined) {
-          c = Color.fromHsv(input);
-        } else if (input.l !== undefined) {
-          c = Color.fromHsl(input);
-        } else {
-          return null;
+          return Color.fromHsv(input);
         }
-        c.a = input.a !== undefined ? toFlt(input.a) : undefined;
-        return new Color(c);
+        if (input.l !== undefined) {
+          return Color.fromHsl(input);
+        }
+        if (input.w !== undefined) {
+          return Color.fromHwb(input);
+        }
+        return null;
       }
       if (input.c !== undefined) {
         return Color.fromCMYK(input);
@@ -352,10 +374,30 @@ export class Color {
     });
   }
   static fromCMYK({c, m, y, k, a}){
+    k = Number(k) / 100;
     const chanCalc = ch => float2Byte(
-      1 - Math.min(1, (ch / 100) * (1 - k) + k)
+      1 - Math.min(1, (Number(ch) / 100) * (1 - k) + k)
     );
-    return new Color({r: chanCalc(c), b: chanCalc(m), g: chanCalc(y), a});
+    return new Color({r: chanCalc(c), g: chanCalc(m), b: chanCalc(y), a});
+  }
+  static fromHwb({h, w, b, a}) {
+    w = Number(w) / 100;
+    b = Number(b) / 100;
+    let rgb;
+    if (w + b >= 1) {
+      const gray = w / (w + b);
+      rgb = [gray, gray, gray];
+    } else {
+      const base = hueToRgb(Number(h));
+      const k = 1 - w - b;
+      rgb = base.map(v => v * k + w);
+    }
+    return new Color({
+      r: float2Byte(rgb[0]),
+      g: float2Byte(rgb[1]),
+      b: float2Byte(rgb[2]),
+      a
+    });
   }
   static fromOklch({l, c, h, a}) {
     // Normalize inputs (l:0-1, c:0+, h:0-360)
@@ -462,6 +504,8 @@ export class Color {
       a: this.alpha
     };
   }
+  get hsla() { return this.hsl; }
+  get hsva() { return this.hsv; }
   get hsl() {
     const r = byte2Float(this.r);
     const g = byte2Float(this.g);
@@ -519,7 +563,22 @@ export class Color {
     y = Math.round(100 * y);
     k = Math.round(100 * k);
 
-    return this.alpha ? { c, m, y, k, a: this.alpha } : { c, m, y, k };
+    const result = { c, m, y, k };
+    if (this.a !== undefined) result.a = this.alpha;
+    return result;
+  }
+  get cmyka() { return this.cmyk; }
+  get hwba() { return this.hwb; }
+  get hwb() {
+    const r = byte2Float(this.r);
+    const g = byte2Float(this.g);
+    const b = byte2Float(this.b);
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const w = Math.round(min * 100);
+    const bk = Math.round((1 - max) * 100);
+    const hsl = this.hsl;
+    return { h: hsl.h, w, b: bk, a: this.alpha };
   }
   get oklch() { // Helper: {r,g,b} bytes to {l,c,h,a}
     const {r, g, b, a} = this;
@@ -555,11 +614,11 @@ export class Color {
   }
   get oklchString() {
     const {l, c, h} = this.oklch;
-    return `oklch(${l} ${c} ${h})`;
+    return `oklch(${round3(l)} ${round3(c)} ${round3(h)})`;
   }
   get oklchaString() {
     const {l, c, h, a} = this.oklch;
-    return `oklch(${l} ${c} ${h} / ${a})`;
+    return `oklch(${round3(l)} ${round3(c)} ${round3(h)} / ${a})`;
   }
   get hslString() {
     const hsl = this.hsl;
@@ -581,12 +640,44 @@ export class Color {
     const cmyk = this.cmyk;
     return `cmyka(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%, ${cmyk.a})`;
   }
+  get hwbString() {
+    const { h, w, b } = this.hwb;
+    return `hwb(${h} ${w}% ${b}%)`;
+  }
+  get hwbaString() {
+    const { h, w, b, a } = this.hwb;
+    return `hwb(${h} ${w}% ${b}% / ${a})`;
+  }
   get isGrayScale(){
     return this.r === this.g && this.g === this.b;
   }
   /** Functions **/
-  toString(format = 'rgb') {// accepts rgb, rgbaHex, hex, hsl, hsla, cmyk, cmyka
-
+  toString(format = 'rgb', options = {}) {
+    const modern = !!options.modern;
+    if (format === 'hwb' || format === 'hwba') {
+      const { h, w, b } = this.hwb;
+      const a = this.alpha;
+      const hasA = this.a !== undefined;
+      if (modern) {
+        return hasA || format === 'hwba'
+          ? `hwb(${h} ${w}% ${b}% / ${a})`
+          : `hwb(${h} ${w}% ${b}%)`;
+      }
+      return hasA || format === 'hwba'
+        ? `hwb(${h}, ${w}%, ${b}%, ${a})`
+        : `hwb(${h}, ${w}%, ${b}%)`;
+    }
+    if (modern && (format === 'rgb' || format === undefined)) {
+      return this.a === undefined
+        ? `rgb(${this.r} ${this.g} ${this.b})`
+        : `rgb(${this.r} ${this.g} ${this.b} / ${this.alpha})`;
+    }
+    if (modern && (format === 'hsl' || format === 'hsla')) {
+      const hsl = this.hsl;
+      return this.a === undefined && format === 'hsl'
+        ? `hsl(${hsl.h} ${hsl.s}% ${hsl.l}%)`
+        : `hsl(${hsl.h} ${hsl.s}% ${hsl.l}% / ${hsl.a})`;
+    }
     switch (format) {
       case 'rgb': return this.rgbString;
       case 'hex': return this.hex;
@@ -601,7 +692,29 @@ export class Color {
       default:return this.rgbString;
     }
   }
-  mix(color, ratio = 0.5) {
+  mix(color, ratio = 0.5, space = 'rgb') {
+    if (space === 'oklch') {
+      const a = this.oklch;
+      const b = Color.parse(color).oklch;
+      const t = toFlt(ratio);
+      return Color.fromOklch({
+        l: a.l + (b.l - a.l) * t,
+        c: a.c + (b.c - a.c) * t,
+        h: mixHue(a.h, b.h, t),
+        a: this.alpha + (Color.parse(color).alpha - this.alpha) * t
+      });
+    }
+    if (space === 'hsl') {
+      const a = this.hsl;
+      const b = Color.parse(color).hsl;
+      const t = toFlt(ratio);
+      return Color.fromHsl({
+        h: mixHue(a.h, b.h, t),
+        s: a.s + (b.s - a.s) * t,
+        l: a.l + (b.l - a.l) * t,
+        a: this.alpha + (Color.parse(color).alpha - this.alpha) * t
+      });
+    }
     const rgb1 = this.rgba;
     rgb1[3] = float2Byte(rgb1[3]);
     const rgb2 = Color.parse(color).rgba;
@@ -609,15 +722,11 @@ export class Color {
     ratio = toFlt(ratio);
     const mixed = rgb1.map((lc, i) => {
       const hc = rgb2[i];
-      // high color is lower than low color - reverse the subtracted vals
       const reverse = hc < lc;
-      // difference between the high and low values
       const diff = reverse ? lc - hc : hc - lc;
       const diffRatio = Math.round(diff * ratio);
-      // add or subtract from lc based on reverse mode
       return reverse ? lc - diffRatio : diffRatio + lc;
     });
-    // noinspection JSValidateTypes
     mixed[3] = byte2Float(mixed[3]);
     return Color.fromArray(mixed);
   }
@@ -629,13 +738,32 @@ export class Color {
     hsl.a = this.a;
     return Color.parse(hsl);
   }
-  lighten(ratio, reverse = false) {
-    return this.adjustSatLum('l', ratio, reverse);
+  lighten(ratio, space = 'hsl') {
+    if (space === 'oklch') {
+      const ok = this.oklch;
+      return Color.fromOklch({
+        l: maxVal(1, ok.l + (1 - ok.l) * ratio),
+        c: ok.c, h: ok.h, a: this.alpha
+      });
+    }
+    return this.adjustSatLum('l', ratio, false);
   }
-  darken(ratio) {
-    return this.lighten(ratio, true);
+  darken(ratio, space = 'hsl') {
+    if (space === 'oklch') {
+      const ok = this.oklch;
+      return Color.fromOklch({
+        l: maxVal(1, ok.l - ok.l * ratio),
+        c: ok.c, h: ok.h, a: this.alpha
+      });
+    }
+    return this.adjustSatLum('l', ratio, true);
   }
-  saturate(ratio, reverse = false) {
+  saturate(ratio, reverse = false, space = 'hsl') {
+    if (space === 'oklch') {
+      const ok = this.oklch;
+      const c = reverse ? ok.c * (1 - Math.abs(ratio)) : ok.c * (1 + ratio);
+      return Color.fromOklch({ l: ok.l, c: Math.max(0, c), h: ok.h, a: this.alpha });
+    }
     if (ratio === 0) return this;
     if (ratio < 0) {
       reverse = true;
@@ -643,7 +771,13 @@ export class Color {
     }
     return this.adjustSatLum('s', ratio, reverse);
   }
-  desaturate(ratio) {
+  desaturate(ratio, space = 'hsl') {
+    if (space === 'oklch') {
+      const ok = this.oklch;
+      return Color.fromOklch({
+        l: ok.l, c: Math.max(0, ok.c * (1 - ratio)), h: ok.h, a: this.alpha
+      });
+    }
     const {h,l} = this.hsl;
     if (ratio >= 1) return Color.fromHsl({h, l, s: 0});
     return Color.fromHsl({h, l, s: maxVal(100, l * (1 - ratio))});
@@ -728,4 +862,48 @@ export class Color {
 
     return shades;
   }
+
+  /** WCAG 2.1 accessibility helpers **/
+  get relativeLuminance() {
+    const ch = v => { const c = v / 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+    return 0.2126 * ch(this.r) + 0.7152 * ch(this.g) + 0.0722 * ch(this.b);
+  }
+  contrast(color2) {
+    const l1 = this.relativeLuminance;
+    const l2 = Color.parse(color2).relativeLuminance;
+    const [hi, lo] = l1 >= l2 ? [l1, l2] : [l2, l1];
+    return (hi + 0.05) / (lo + 0.05);
+  }
+  isReadable(color2, { level = 'AA', size = 'normal' } = {}) {
+    const ratio = this.contrast(color2);
+    if (level === 'AAA') return size === 'large' ? ratio >= 4.5 : ratio >= 7;
+    return size === 'large' ? ratio >= 3 : ratio >= 4.5;
+  }
+
+  /** Value equality **/
+  equals(color2) {
+    const c = Color.parse(color2);
+    return this.r === c.r && this.g === c.g && this.b === c.b && this.alpha === c.alpha;
+  }
+
+  /** Color harmonies (return arrays of Color instances) **/
+  complementary() { return [this, this.hue(180)]; }
+  analogous(angle = 30) { return [this.hue(-angle), this, this.hue(angle)]; }
+  triadic() { return [this, this.hue(120), this.hue(240)]; }
+  tetradic(angle = 60) {
+    return [this, this.hue(angle), this.hue(180), this.hue(180 + angle)];
+  }
+
+  /** Nearest HTML named color (brute-force against namedColors) **/
+  static nearestNamed(input) {
+    const target = input instanceof Color ? input : Color.parse(input);
+    let best = null, bestDist = Infinity;
+    for (const [name, hex] of Object.entries(namedColors)) {
+      const c = Color.fromHex(hex);
+      const d = (c.r - target.r) ** 2 + (c.g - target.g) ** 2 + (c.b - target.b) ** 2;
+      if (d < bestDist) { bestDist = d; best = name; }
+    }
+    return best;
+  }
+  nearestNamed() { return Color.nearestNamed(this); }
 }

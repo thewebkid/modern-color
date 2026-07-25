@@ -20,7 +20,6 @@ const rotated = salmon.hue(180);
 document.body.style.background = lighter; // Auto-converts to CSS
 ```
 
-[Raw Gist](https://gist.github.com/thewebkid/e3a1c969564256aeaf6f5137d03fa401)
 
 ## Installation
     npm i --save modern-color
